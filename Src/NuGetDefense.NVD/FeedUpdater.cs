@@ -51,32 +51,21 @@ namespace NuGetDefense.NVD
                     cpe.ProductVersion = string.IsNullOrWhiteSpace(range.ToString()) ? "*" : range.ToString();
                 }
 
-                Console.WriteLine($"CVE: {feedVuln.Cve.CveDataMeta.Id}");
-                Console.WriteLine($"Product: {cpe.ProductVersion}");
                 var cwe = "";
                 if (feedVuln.Cve.Problemtype.ProblemtypeData.Any())
                     if (feedVuln.Cve.Problemtype.ProblemtypeData[0].Description.Any())
                     {
                         cwe = feedVuln.Cve.Problemtype.ProblemtypeData[0].Description[0].Value;
-                        Console.WriteLine(
-                            $"CWE: {cwe}");
                     }
-
-                Console.WriteLine($"Product: {cpe.Product}");
+                
                 var description = "";
                 if (feedVuln.Cve.Description.DescriptionData.Any())
                 {
-                    Console.WriteLine(
-                        $"Descritption: {feedVuln.Cve.Description.DescriptionData.First().Value}");
                     description = feedVuln.Cve.Description.DescriptionData.First().Value;
                 }
 
                 //TODO: Multiple Version Ranges need to be supported which means getting a more complicated range instead of replacing.
-
-                Console.WriteLine($"Vendor: {cpe.Vendor}");
-                Console.WriteLine(
-                    $"CSVSS Score: {feedVuln.Impact.BaseMetricV3?.CvssV3?.BaseScore?.ToString() ?? ""}");
-                Console.WriteLine($"CSVSS Vector: {feedVuln.Impact.BaseMetricV3?.CvssV3?.AttackVector}");
+                
                 if (!nvdDict.ContainsKey(cpe.Product))
                     nvdDict.Add(cpe.Product,
                         new Dictionary<string, VulnerabilityEntry>());
@@ -98,9 +87,6 @@ namespace NuGetDefense.NVD
                 }
                 else
                 {
-                    Console.WriteLine(
-                        $"There is already an entry for {cpe.Product} with CVE: {feedVuln.Cve.CveDataMeta.Id}. Changing Version to: {cpe.ProductVersion}");
-
                     var vuln = nvdDict[cpe.Product][feedVuln.Cve.CveDataMeta.Id];
                     var versionList = vuln.Versions.ToList();
                     if (versionList.Contains(cpe.ProductVersion)) continue;
@@ -150,9 +136,6 @@ namespace NuGetDefense.NVD
 
         private static async Task<NVDFeed> GetFeedAsync(string link)
         {
-            var fileName = link.Substring(link.LastIndexOf('/') + 1);
-            fileName = fileName.Substring(0, fileName.LastIndexOf('.'));
-            Console.WriteLine(link);
             using var feedDownloader = new WebClient();
             Stream jsonZippedDataStream = new MemoryStream(feedDownloader.DownloadData(link));
             var zipfile = new ZipArchive(jsonZippedDataStream);
