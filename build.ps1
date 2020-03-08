@@ -12,9 +12,16 @@ dotnet restore ./Src/NVDFeedImporter/NVDFeedImporter.csproj
 dotnet build -c Release ./Src/NVDFeedImporter/NVDFeedImporter.csproj
 dotnet ./Src/NVDFeedImporter/bin/Release/netcoreapp3.1/NVDFeedImporter.dll
 
+$destination = './Src/NuGetDefense.NVD/bin/Release/netstandard2.0/'
+
+if(!(Test-Path $destination))
+{
+    New-Item -Path $destination -ItemType Directory -Force | Out-Null
+}
+
 $MoveBinArgs = @{
     Path = 'VulnerabilityData.bin'
-    Destination = './Src/NuGetDefense.NVD/bin/Release/netstandard2.0/VulnerabilityData.bin'
+    Destination = $destination
     Force = $true
 }
 
