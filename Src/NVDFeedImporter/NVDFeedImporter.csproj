@@ -8,7 +8,22 @@
     <ItemGroup>
       <PackageReference Include="MessagePack" Version="2.1.90" />
       <PackageReference Include="NuGet.Versioning" Version="5.4.0" />
-      <PackageReference Include="NuGetDefense.NVD" Version="1.0.0" />
+      <PackageReference Include="NuGetDefense.Core" Version="1.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Include="..\NuGetDefense.NVD\CpeParser.cs">
+        <Link>CpeParser.cs</Link>
+      </Compile>
+      <Compile Include="..\NuGetDefense.NVD\FeedUpdater.cs">
+        <Link>FeedUpdater.cs</Link>
+      </Compile>
+      <Compile Include="..\NuGetDefense.NVD\FeedVulnerabilities.cs">
+        <Link>FeedVulnerabilities.cs</Link>
+      </Compile>
+      <Compile Include="..\NuGetDefense.NVD\NVDFeed.cs">
+        <Link>NVDFeed.cs</Link>
+      </Compile>
     </ItemGroup>
 
 </Project>
