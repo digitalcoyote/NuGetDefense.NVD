@@ -1,6 +1,6 @@
 # NuGetDefense.NVD
 
-[![Join the chat at https://gitter.im/NuGetDefense/community](https://badges.gitter.im/NuGetDefense/community.svg)](https://gitter.im/NuGetDefense/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/NuGetDefense/community](https://badges.gitter.im/NuGetDefense/community.svg)](https://gitter.im/NuGetDefense/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)  [![NuGet version](https://badge.fury.io/nu/NuGetDefense.NVD.svg)](https://badge.fury.io/nu/NuGetDefense.NVD)
 
 NuGetDefense.NVD contains the NVD Feed parsing/scanning functionality from NuGetDefense.
   
