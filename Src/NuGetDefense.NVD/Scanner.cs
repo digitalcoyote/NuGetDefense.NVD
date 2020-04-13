@@ -13,27 +13,43 @@ namespace NuGetDefense.NVD
     {
         private readonly Dictionary<string, Dictionary<string, VulnerabilityEntry>> nvdDict;
 
-        public Scanner(string nugetFile, bool breakIfCannotRun = false, bool selfUpdate = false)
+        public Scanner(string nugetFile, TimeSpan timeout, bool breakIfCannotRun = false, bool selfUpdate = false)
         {
+            NugetFile = nugetFile;
+            BreakIfCannotRun = breakIfCannotRun;
             var lz4Options = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray)
                 .WithSecurity(MessagePackSecurity.UntrustedData);
             var vulnDataFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
                 "VulnerabilityData.bin");
+            var dateTime = DateTime.Now.Add(timeout);
+            bool flag;
+            do
+            {
+                try
+                {
+                    var nvdData = File.Open(vulnDataFile, FileMode.Open, FileAccess.Read);
+                    flag = false;
+                    nvdDict = MessagePackSerializer
+                        .Deserialize<
+                            Dictionary<string, Dictionary<string, VulnerabilityEntry>>>(nvdData, lz4Options);
+                    nvdData.Close();
+                }
+                catch (Exception e)
+                {
+                    flag = DateTime.Now <= dateTime;
+                    if (!flag && BreakIfCannotRun)
+                        throw new TimeoutException($"Reading vulnerability data failed:'{vulnDataFile}'", e);
+                    Console.WriteLine("Retrying");
+                }
+            }
+            while (flag);
 
-            var nvdData = File.Open(vulnDataFile, FileMode.Open, FileAccess.Read);
-            nvdDict = MessagePackSerializer
-                .Deserialize<
-                    Dictionary<string, Dictionary<string, VulnerabilityEntry>>>(nvdData, lz4Options);
-            nvdData.Close();
-            NugetFile = nugetFile;
-            BreakIfCannotRun = breakIfCannotRun;
-            
             if (!selfUpdate) return;
             var recentFeed = FeedUpdater.GetRecentFeedAsync().Result;
             var modifiedFeed = FeedUpdater.GetModifiedFeedAsync().Result;
             FeedUpdater.AddFeedToVulnerabilityData(recentFeed, nvdDict);
             FeedUpdater.AddFeedToVulnerabilityData(modifiedFeed, nvdDict);
-            VulnerabilityData.SaveToBinFile(nvdDict, "VulnerabilityData.bin");
+            VulnerabilityData.SaveToBinFile(nvdDict, "VulnerabilityData.bin", timeout);
         }
 
         private string NugetFile { get; }
