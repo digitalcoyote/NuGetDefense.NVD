@@ -8,7 +8,7 @@
     <ItemGroup>
       <PackageReference Include="MessagePack" Version="2.1.115" />
       <PackageReference Include="NuGet.Versioning" Version="5.5.1" />
-      <PackageReference Include="NuGetDefense.Core" Version="1.0.2" />
+      <PackageReference Include="NuGetDefense.Core" Version="1.0.3" />
     </ItemGroup>
 
     <ItemGroup>
