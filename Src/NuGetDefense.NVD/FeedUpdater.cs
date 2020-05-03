@@ -19,79 +19,84 @@ namespace NuGetDefense.NVD
             Dictionary<string, Dictionary<string, VulnerabilityEntry>> nvdDict)
         {
             foreach (var feedVuln in feed.CveItems)
-            foreach (var match in feedVuln.Configurations.Nodes.Where(n => n.CpeMatch != null)
-                .SelectMany(n => n.CpeMatch))
             {
-                var cpe = Cpe.Parse(match.Cpe23Uri);
-                if (cpe.Part != "a") continue;
-                if (cpe.ProductVersion == "-")
+                var versions = new List<string>();
+                var validNuGetPackage = true;
+                foreach (var match in feedVuln.Configurations.Nodes.Where(n => n.CpeMatch != null)
+                    .SelectMany(n => n.CpeMatch))
                 {
-                    NuGetVersion start = null;
-                    NuGetVersion end = null;
-                    var includeStart = false;
-                    var includeEnd = false;
-                    if (!string.IsNullOrWhiteSpace(match.VersionStartIncluding))
+                    var cpe = Cpe.Parse(match.Cpe23Uri);
+                    if (cpe.Part != "a") continue;
+                    if (cpe.ProductVersion == "-" || cpe.ProductVersion == "*")
                     {
-                        start = NuGetVersion.Parse(match.VersionStartIncluding);
-                        includeStart = true;
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(match.VersionEndIncluding))
-                    {
-                        end = NuGetVersion.Parse(match.VersionEndIncluding);
-                        includeEnd = true;
-                    }
-                    else if (!string.IsNullOrWhiteSpace(match.VersionEndExcluding))
-                    {
-                        end = NuGetVersion.Parse(match.VersionEndExcluding);
-                    }
-
-                    var range = new VersionRange(start, includeStart, end, includeEnd);
-
-                    cpe.ProductVersion = string.IsNullOrWhiteSpace(range.ToString()) ? "*" : range.ToString();
-                }
-
-                var cwe = "";
-                if (feedVuln.Cve.Problemtype.ProblemtypeData.Any())
-                    if (feedVuln.Cve.Problemtype.ProblemtypeData[0].Description.Any())
-                    {
-                        cwe = feedVuln.Cve.Problemtype.ProblemtypeData[0].Description[0].Value;
-                    }
-                
-                var description = "";
-                if (feedVuln.Cve.Description.DescriptionData.Any())
-                {
-                    description = feedVuln.Cve.Description.DescriptionData.First().Value;
-                }
-
-                //TODO: Multiple Version Ranges need to be supported which means getting a more complicated range instead of replacing.
-                
-                if (!nvdDict.ContainsKey(cpe.Product))
-                    nvdDict.Add(cpe.Product,
-                        new Dictionary<string, VulnerabilityEntry>());
-                if (!nvdDict[cpe.Product].ContainsKey(feedVuln.Cve.CveDataMeta.Id))
-                {
-                    var specifiedVector = Enum.TryParse<Vulnerability.AccessVectorType>(
-                        feedVuln.Impact.BaseMetricV3?.CvssV3?.AttackVector, out var vector);
-                    nvdDict[cpe.Product].Add(feedVuln.Cve.CveDataMeta.Id, new VulnerabilityEntry
+                        NuGetVersion start = null;
+                        NuGetVersion end = null;
+                        var includeStart = false;
+                        var includeEnd = false;
+                        if (!string.IsNullOrWhiteSpace(match.VersionStartIncluding))
                         {
-                            Versions = new[] {cpe.ProductVersion},
-                            Description = description,
-                            Cwe = cwe,
-                            Vendor = cpe.Vendor,
-                            Score = feedVuln.Impact.BaseMetricV3?.CvssV3?.BaseScore,
-                            Vector = specifiedVector ? vector : Vulnerability.AccessVectorType.UNSPECIFIED,
-                            References = feedVuln.Cve.References.ReferenceData.Select(r => r.Url.ToString()).ToArray()
+                            validNuGetPackage = validNuGetPackage &&
+                                                NuGetVersion.TryParse(match.VersionStartIncluding, out start);
+                            includeStart = true;
                         }
-                    );
-                }
-                else
-                {
-                    var vuln = nvdDict[cpe.Product][feedVuln.Cve.CveDataMeta.Id];
-                    var versionList = vuln.Versions.ToList();
-                    if (versionList.Contains(cpe.ProductVersion)) continue;
-                    versionList.Add(cpe.ProductVersion);
-                    vuln.Versions = versionList.ToArray();
+
+                        if (!string.IsNullOrWhiteSpace(match.VersionEndIncluding))
+                        {
+                            validNuGetPackage = validNuGetPackage &&
+                                                NuGetVersion.TryParse(match.VersionEndExcluding, out end);
+                            includeEnd = true;
+                        }
+                        else if (!string.IsNullOrWhiteSpace(match.VersionEndExcluding))
+                        {
+                            validNuGetPackage = validNuGetPackage &&
+                                                NuGetVersion.TryParse(match.VersionEndExcluding, out end);
+                        }
+                        
+                        if (!validNuGetPackage) continue;
+                        var range = new VersionRange(start, includeStart, end, includeEnd);
+
+                        versions.Add(string.IsNullOrWhiteSpace(range.ToString()) ? "*" : range.ToString());
+                        if (versions.Count > 1) versions = versions.Where(s => s != "*").ToList();
+                    }
+                    var cwe = "";
+                        if (feedVuln.Cve.Problemtype.ProblemtypeData.Any())
+                            if (feedVuln.Cve.Problemtype.ProblemtypeData[0].Description.Any())
+                            {
+                                cwe = feedVuln.Cve.Problemtype.ProblemtypeData[0].Description[0].Value;
+                            }
+
+                        var description = "";
+                        if (feedVuln.Cve.Description.DescriptionData.Any())
+                        {
+                            description = feedVuln.Cve.Description.DescriptionData.First().Value;
+                        }
+
+                        if (!nvdDict.ContainsKey(cpe.Product))
+                            nvdDict.Add(cpe.Product,
+                                new Dictionary<string, VulnerabilityEntry>());
+                        if (!nvdDict[cpe.Product].ContainsKey(feedVuln.Cve.CveDataMeta.Id))
+                        {
+                            var specifiedVector = Enum.TryParse<Vulnerability.AccessVectorType>(
+                                feedVuln.Impact.BaseMetricV3?.CvssV3?.AttackVector, out var vector);
+                            nvdDict[cpe.Product].Add(feedVuln.Cve.CveDataMeta.Id, new VulnerabilityEntry
+                                {
+                                    Versions = versions.ToArray(),
+                                    Description = description,
+                                    Cwe = cwe,
+                                    Vendor = cpe.Vendor,
+                                    Score = feedVuln.Impact.BaseMetricV3?.CvssV3?.BaseScore,
+                                    Vector = specifiedVector ? vector : Vulnerability.AccessVectorType.UNSPECIFIED,
+                                    References = feedVuln.Cve.References.ReferenceData.Select(r => r.Url.ToString())
+                                        .ToArray()
+                                }
+                            );
+                        }
+                        else
+                        {
+                            var vuln = nvdDict[cpe.Product][feedVuln.Cve.CveDataMeta.Id];
+                            var versionList = vuln.Versions.Union(versions);
+                            vuln.Versions = versionList.ToArray();
+                        }
                 }
             }
         }
@@ -138,8 +143,8 @@ namespace NuGetDefense.NVD
         {
             using var feedDownloader = new WebClient();
             Stream jsonZippedDataStream = new MemoryStream(feedDownloader.DownloadData(link));
-            var zipfile = new ZipArchive(jsonZippedDataStream);
-            var entryStream = zipfile.Entries[0].Open();
+            var zipFile = new ZipArchive(jsonZippedDataStream);
+            var entryStream = zipFile.Entries[0].Open();
             return await JsonSerializer.DeserializeAsync<NVDFeed>(entryStream, new JsonSerializerOptions());
         }
     }

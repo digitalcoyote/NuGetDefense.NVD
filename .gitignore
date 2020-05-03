@@ -5,3 +5,5 @@
 *.cache
 *.blob
 **/.idea/**/*
+
+*.user

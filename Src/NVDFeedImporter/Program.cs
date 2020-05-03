@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using NuGet.Versioning;
 using NuGetDefense;
 using NuGetDefense.NVD;
 
@@ -16,7 +17,6 @@ namespace NVDFeedImporter
                 new Dictionary<string, Dictionary<string, VulnerabilityEntry>>();
             await foreach (var feed in FeedUpdater.GetFeedsAsync())
                 FeedUpdater.AddFeedToVulnerabilityData(feed, vulnDict);
-
             VulnerabilityData.SaveToBinFile(vulnDict, BinName, TimeSpan.FromMinutes(1));
         }
     }

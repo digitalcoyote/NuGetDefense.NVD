@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MessagePack" Version="2.1.115" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
+        <PackageReference Include="NuGet.Versioning" Version="5.5.1" />
+        <PackageReference Include="NuGetDefense.Core" Version="1.0.4" />
+        <PackageReference Include="System.Text.Json" Version="4.7.1" />
+        <PackageReference Include="xunit" Version="2.4.1" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
+        <PackageReference Include="coverlet.collector" Version="1.2.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\NuGetDefense.NVD\NuGetDefense.NVD.csproj" />
+      <ProjectReference Include="..\NVDFeedImporter\NVDFeedImporter.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="TestFiles\nvdcve-bootstrap.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+</Project>

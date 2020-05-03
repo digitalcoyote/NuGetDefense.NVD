@@ -39,7 +39,6 @@ namespace NuGetDefense.NVD
                     flag = DateTime.Now <= dateTime;
                     if (!flag && BreakIfCannotRun)
                         throw new TimeoutException($"Reading vulnerability data failed:'{vulnDataFile}'", e);
-                    Console.WriteLine("Retrying");
                 }
             }
             while (flag);
