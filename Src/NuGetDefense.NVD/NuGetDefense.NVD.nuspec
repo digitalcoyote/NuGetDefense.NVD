@@ -3,7 +3,7 @@
   <metadata>
     <id>NuGetDefense.NVD</id>
     <title>NuGetDefense.NVD</title>
-    <version>1.0.2.0</version>
+    <version>1.0.2.1</version>
     <authors>Curtis Carter</authors>
     <owners>Curtis Carter</owners>
     <projectUrl>https://github.com/DigitalCoyote/NuGetDefense</projectUrl>
@@ -17,8 +17,8 @@
     <dependencies>
       <group targetFramework=".NETStandard2.0">
         <dependency id="MessagePack" version="2.1.115" />
-        <dependency id="System.Text.Json" version="4.7.1" />
-        <dependency id="NuGet.Versioning" version="5.5.1" />
+        <dependency id="System.Text.Json" version="4.7.2" />
+        <dependency id="NuGet.Versioning" version="5.6.0" />
         <dependency id="NuGetDefense.Core" version="1.0.4" />
       </group>
     </dependencies>
