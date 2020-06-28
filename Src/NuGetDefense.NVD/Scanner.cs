@@ -11,9 +11,9 @@ namespace NuGetDefense.NVD
 {
     public class Scanner
     {
-        private readonly Dictionary<string, Dictionary<string, VulnerabilityEntry>> nvdDict;
+        private readonly Dictionary<string, Dictionary<string, VulnerabilityEntry>> _nvdDict;
 
-        public Scanner(string nugetFile, TimeSpan timeout, bool breakIfCannotRun = false, bool selfUpdate = false)
+        public Scanner(string nugetFile, TimeSpan vulnDataReaTimeout, bool breakIfCannotRun = false, bool selfUpdate = false)
         {
             NugetFile = nugetFile;
             BreakIfCannotRun = breakIfCannotRun;
@@ -21,34 +21,34 @@ namespace NuGetDefense.NVD
                 .WithSecurity(MessagePackSecurity.UntrustedData);
             var vulnDataFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
                 "VulnerabilityData.bin");
-            var dateTime = DateTime.Now.Add(timeout);
-            bool flag;
+            var startDateTime = DateTime.Now.Add(vulnDataReaTimeout);
+            bool ableToReadVulnerabilityData;
             do
             {
                 try
                 {
                     var nvdData = File.Open(vulnDataFile, FileMode.Open, FileAccess.Read);
-                    flag = false;
-                    nvdDict = MessagePackSerializer
+                    ableToReadVulnerabilityData = false;
+                    _nvdDict = MessagePackSerializer
                         .Deserialize<
                             Dictionary<string, Dictionary<string, VulnerabilityEntry>>>(nvdData, lz4Options);
                     nvdData.Close();
                 }
                 catch (Exception e)
                 {
-                    flag = DateTime.Now <= dateTime;
-                    if (!flag && BreakIfCannotRun)
+                    ableToReadVulnerabilityData = DateTime.Now <= startDateTime;
+                    if (!ableToReadVulnerabilityData && BreakIfCannotRun)
                         throw new TimeoutException($"Reading vulnerability data failed:'{vulnDataFile}'", e);
                 }
             }
-            while (flag);
+            while (ableToReadVulnerabilityData);
 
             if (!selfUpdate) return;
             var recentFeed = FeedUpdater.GetRecentFeedAsync().Result;
             var modifiedFeed = FeedUpdater.GetModifiedFeedAsync().Result;
-            FeedUpdater.AddFeedToVulnerabilityData(recentFeed, nvdDict);
-            FeedUpdater.AddFeedToVulnerabilityData(modifiedFeed, nvdDict);
-            VulnerabilityData.SaveToBinFile(nvdDict, "VulnerabilityData.bin", timeout);
+            FeedUpdater.AddFeedToVulnerabilityData(recentFeed, _nvdDict);
+            FeedUpdater.AddFeedToVulnerabilityData(modifiedFeed, _nvdDict);
+            VulnerabilityData.SaveToBinFile(_nvdDict, "VulnerabilityData.bin", vulnDataReaTimeout);
         }
 
         private string NugetFile { get; }
@@ -63,11 +63,11 @@ namespace NuGetDefense.NVD
                 foreach (var pkg in pkgs)
                 {
                     var pkgId = pkg.Id.ToLower();
-                    if (!nvdDict.ContainsKey(pkgId)) continue;
+                    if (!_nvdDict.ContainsKey(pkgId)) continue;
                     if (!vulnDict.ContainsKey(pkgId)) vulnDict.Add(pkgId, new Dictionary<string, Vulnerability>());
-                    foreach (var cve in nvdDict[pkgId].Keys.Where(cve => nvdDict[pkgId][cve].Versions.Any(v =>
+                    foreach (var cve in _nvdDict[pkgId].Keys.Where(cve => _nvdDict[pkgId][cve].Versions.Any(v =>
                         VersionRange.Parse(v).Satisfies(new NuGetVersion(pkg.Version)))))
-                        vulnDict[pkgId].Add(cve, ToVulnerability(cve, nvdDict[pkgId][cve]));
+                        vulnDict[pkgId].Add(cve, ToVulnerability(cve, _nvdDict[pkgId][cve]));
                 }
             }
             catch (Exception e)
