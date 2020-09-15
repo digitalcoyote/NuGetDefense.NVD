@@ -40,8 +40,7 @@ namespace NuGetDefense.NVD
                     if (!ableToReadVulnerabilityData && BreakIfCannotRun)
                         throw new TimeoutException($"Reading vulnerability data failed:'{vulnDataFile}'", e);
                 }
-            }
-            while (ableToReadVulnerabilityData);
+            } while (ableToReadVulnerabilityData);
 
             if (!selfUpdate) return;
             var recentFeed = FeedUpdater.GetRecentFeedAsync().Result;
