@@ -66,7 +66,8 @@ namespace NuGetDefense.NVD
                     if (!vulnDict.ContainsKey(pkgId)) vulnDict.Add(pkgId, new Dictionary<string, Vulnerability>());
                     foreach (var cve in _nvdDict[pkgId].Keys.Where(cve => _nvdDict[pkgId][cve].Versions.Any(v =>
                         VersionRange.Parse(v).Satisfies(new NuGetVersion(pkg.Version)))))
-                        vulnDict[pkgId].Add(cve, ToVulnerability(cve, _nvdDict[pkgId][cve]));
+                        if (!vulnDict[pkgId].ContainsKey(cve))
+                            vulnDict[pkgId].Add(cve, ToVulnerability(cve, _nvdDict[pkgId][cve]));
                 }
             }
             catch (Exception e)
