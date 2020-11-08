@@ -82,15 +82,15 @@ namespace NuGetDefense.NVD
         public Vulnerability ToVulnerability(string cve,
             VulnerabilityEntry vulnerability)
         {
-            return new Vulnerability
-            {
-                Cve = cve,
-                Description = vulnerability.Description,
-                Cwe = vulnerability.Cwe,
-                Vendor = vulnerability.Vendor,
-                CvssScore = vulnerability.Score ?? -1,
-                Vector = vulnerability.Vector
-            };
+            return new Vulnerability(
+                cve,
+                vulnerability.Score ?? -1,
+                vulnerability.Cwe,
+                vulnerability.Description,
+                null,
+                vulnerability.Vector,
+                vulnerability.Vendor
+            );
         }
     }
 }

@@ -36,7 +36,7 @@ namespace NVDFeedImporterTests
         [Fact]
         public void CorrectVulnerabilityVersions()
         {
-            var versions = _vulnDict.FindCve("CVE-2018-14040").Versions;
+            var versions = _vulnDict.FindCve("CVE-2018-14040")?.Versions;
             var ExpectedVersions = new[]
             {
                 "[4.0.0, 4.1.2)",

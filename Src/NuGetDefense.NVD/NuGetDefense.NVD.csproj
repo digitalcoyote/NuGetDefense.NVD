@@ -10,7 +10,7 @@
     <ItemGroup>
       <PackageReference Include="MessagePack" Version="2.2.60" />
       <PackageReference Include="NuGet.Versioning" Version="5.7.0" />
-      <PackageReference Include="NuGetDefense.Core" Version="1.0.7" />
+      <PackageReference Include="NuGetDefense.Core" Version="1.0.8" />
       <PackageReference Include="System.Text.Json" Version="4.7.2" />
     </ItemGroup>
 
