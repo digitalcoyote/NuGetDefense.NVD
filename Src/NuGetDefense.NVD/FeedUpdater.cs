@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -107,7 +108,7 @@ namespace NuGetDefense.NVD
             var feedsPage = client.DownloadString("https://nvd.nist.gov/vuln/data-feeds");
             var ls = Regex.Matches(feedsPage,
                 linkRegex,
-                RegexOptions.Singleline).Cast<Match>().Select(m => m.ToString());
+                RegexOptions.Singleline).Cast<Match>().Select(m => m.ToString()).ToImmutableArray();
             return ls;
         }
 
