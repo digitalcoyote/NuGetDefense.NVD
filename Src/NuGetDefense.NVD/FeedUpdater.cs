@@ -124,13 +124,13 @@ namespace NuGetDefense.NVD
 
         public static async Task<NVDFeed> GetRecentFeedAsync()
         {
-            var link = GetJsonLinks(@"(https:\/\/nvd\.nist\.gov)*\/feeds\/json\/cve\/\d{0,4}\.?\d{0,4}\.?\/nvdcve-\d{0,4}\.?\d{0,4}\.?-modified\.json\.zip").FirstOrDefault();
+            var link = GetJsonLinks(@"(https:\/\/nvd\.nist\.gov)*\/feeds\/json\/cve\/\d{0,4}\.?\d{0,4}\.?\/nvdcve-\d{0,4}\.?\d{0,4}\.?-recent\.json\.zip").FirstOrDefault();
             return await GetFeedAsync(link);
         }
 
         public static async Task<NVDFeed> GetModifiedFeedAsync()
         {
-            var link = GetJsonLinks(@"(https:\/\/nvd\.nist\.gov)*\/feeds\/json\/cve\/\d{0,4}\.?\d{0,4}\.?\/nvdcve-\d{0,4}\.?\d{0,4}\.?-recent\.json\.zip").FirstOrDefault();
+            var link = GetJsonLinks(@"(https:\/\/nvd\.nist\.gov)*\/feeds\/json\/cve\/\d{0,4}\.?\d{0,4}\.?\/nvdcve-\d{0,4}\.?\d{0,4}\.?-modified\.json\.zip").FirstOrDefault();
             return await GetFeedAsync(link);
         }
 
