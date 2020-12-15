@@ -98,7 +98,7 @@ namespace NuGetDefense.NVD
             }
         }
 
-        public static IEnumerable<string> GetJsonLinks(string linkRegex = "")
+        public static ImmutableArray<string> GetJsonLinks(string linkRegex = "")
         {
             using var client = new WebClient();
             if (string.IsNullOrWhiteSpace(linkRegex))
@@ -114,7 +114,12 @@ namespace NuGetDefense.NVD
 
         public static async IAsyncEnumerable<NVDFeed> GetFeedsAsync()
         {
-            foreach (var link in GetJsonLinks()) yield return await GetFeedAsync(link);
+            var links = GetJsonLinks();
+            for (var index = links.Length - 1; index >= 0; index--)
+            {
+                var link = links[index];
+                yield return await GetFeedAsync(link);
+            }
         }
 
         public static NVDFeed GetFeed(string link)
