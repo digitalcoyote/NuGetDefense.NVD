@@ -10,4 +10,8 @@
       <ProjectReference Include="..\NuGetDefense.NVD\NuGetDefense.NVD.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="NuGetDefense" Version="2.0.2" />
+    </ItemGroup>
+
 </Project>

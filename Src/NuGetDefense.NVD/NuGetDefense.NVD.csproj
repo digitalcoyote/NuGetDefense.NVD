@@ -21,9 +21,10 @@
         <None Include="icon.png" Pack="true" PackagePath="\" />
     </ItemGroup>    
     <ItemGroup>
-      <PackageReference Include="MessagePack" Version="2.2.60" />
-      <PackageReference Include="NuGet.Versioning" Version="5.7.0" />
-      <PackageReference Include="NuGetDefense.Core" Version="2.0.0-pre0001" />
-      <PackageReference Include="System.Text.Json" Version="4.7.2" />
+      <PackageReference Include="MessagePack" Version="2.2.85" />
+      <PackageReference Include="NuGet.Versioning" Version="5.8.0" />
+      <PackageReference Include="NuGetDefense" Version="2.0.2" />
+      <PackageReference Include="NuGetDefense.Core" Version="2.0.0" />
+      <PackageReference Include="System.Text.Json" Version="5.0.0" />
     </ItemGroup>
 </Project>
