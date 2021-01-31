@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
+using System.Threading.Tasks;
 using MessagePack;
 using NuGet.Versioning;
 using NuGetDefense.Core;
@@ -19,35 +19,51 @@ namespace NuGetDefense.NVD
             BreakIfCannotRun = breakIfCannotRun;
             var lz4Options = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray)
                 .WithSecurity(MessagePackSecurity.UntrustedData);
-            var vulnDataFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location),
+            var vulnDataFile = Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory),
                 "VulnerabilityData.bin");
-            var startDateTime = DateTime.Now.Add(vulnDataReaTimeout);
-            bool ableToReadVulnerabilityData;
-            do
+            if (!File.Exists(vulnDataFile))
             {
-                try
+                _nvdDict = CreateNewVulnDataBin(vulnDataFile).Result;
+            }
+            else
+            {
+                var startDateTime = DateTime.Now.Add(vulnDataReaTimeout);
+                bool ableToReadVulnerabilityData;
+                do
                 {
-                    var nvdData = File.Open(vulnDataFile, FileMode.Open, FileAccess.Read);
-                    ableToReadVulnerabilityData = false;
-                    _nvdDict = MessagePackSerializer
-                        .Deserialize<
-                            Dictionary<string, Dictionary<string, VulnerabilityEntry>>>(nvdData, lz4Options);
-                    nvdData.Close();
-                }
-                catch (Exception e)
-                {
-                    ableToReadVulnerabilityData = DateTime.Now <= startDateTime;
-                    if (!ableToReadVulnerabilityData && BreakIfCannotRun)
-                        throw new TimeoutException($"Reading vulnerability data failed:'{vulnDataFile}'", e);
-                }
-            } while (ableToReadVulnerabilityData);
+                    try
+                    {
+                        var nvdData = File.Open(vulnDataFile, FileMode.Open, FileAccess.Read);
+                        ableToReadVulnerabilityData = false;
+                        _nvdDict = MessagePackSerializer
+                            .Deserialize<
+                                Dictionary<string, Dictionary<string, VulnerabilityEntry>>>(nvdData, lz4Options);
+                        nvdData.Close();
+                    }
+                    catch (Exception e)
+                    {
+                        ableToReadVulnerabilityData = DateTime.Now <= startDateTime;
+                        if (!ableToReadVulnerabilityData && BreakIfCannotRun)
+                            throw new TimeoutException($"Reading vulnerability data failed:'{vulnDataFile}'", e);
+                    }
+                } while (ableToReadVulnerabilityData);
 
-            if (!selfUpdate) return;
-            var recentFeed = FeedUpdater.GetRecentFeedAsync().Result;
-            var modifiedFeed = FeedUpdater.GetModifiedFeedAsync().Result;
-            FeedUpdater.AddFeedToVulnerabilityData(recentFeed, _nvdDict);
-            FeedUpdater.AddFeedToVulnerabilityData(modifiedFeed, _nvdDict);
-            VulnerabilityData.SaveToBinFile(_nvdDict, "VulnerabilityData.bin", vulnDataReaTimeout);
+                if (!selfUpdate) return;
+                var recentFeed = FeedUpdater.GetRecentFeedAsync().Result;
+                var modifiedFeed = FeedUpdater.GetModifiedFeedAsync().Result;
+                FeedUpdater.AddFeedToVulnerabilityData(recentFeed, _nvdDict);
+                FeedUpdater.AddFeedToVulnerabilityData(modifiedFeed, _nvdDict);
+                VulnerabilityData.SaveToBinFile(_nvdDict, "VulnerabilityData.bin", vulnDataReaTimeout);
+            }
+        }
+
+        public static async Task<Dictionary<string, Dictionary<string, VulnerabilityEntry>>> CreateNewVulnDataBin(string vulnDataFile)
+        {
+            var vulnDict = new Dictionary<string, Dictionary<string, VulnerabilityEntry>>();
+            await foreach (var feed in FeedUpdater.GetFeedsAsync())
+                FeedUpdater.AddFeedToVulnerabilityData(feed, vulnDict);
+            VulnerabilityData.SaveToBinFile(vulnDict, vulnDataFile, TimeSpan.FromMinutes(10));
+            return vulnDict;
         }
 
         private string NugetFile { get; }
@@ -58,16 +74,17 @@ namespace NuGetDefense.NVD
         {
             try
             {
-                if (vulnDict == null) vulnDict = new Dictionary<string, Dictionary<string, Vulnerability>>();
+                vulnDict ??= new Dictionary<string, Dictionary<string, Vulnerability>>();
                 foreach (var pkg in pkgs)
                 {
                     var pkgId = pkg.Id.ToLower();
+                    var pkgUrl = pkg.PackageUrl.ToLower();
                     if (!_nvdDict.ContainsKey(pkgId)) continue;
-                    if (!vulnDict.ContainsKey(pkgId)) vulnDict.Add(pkgId, new Dictionary<string, Vulnerability>());
+                    if (!vulnDict.ContainsKey(pkgUrl)) vulnDict.Add(pkgUrl, new Dictionary<string, Vulnerability>());
                     foreach (var cve in _nvdDict[pkgId].Keys.Where(cve => _nvdDict[pkgId][cve].Versions.Any(v =>
                         VersionRange.Parse(v).Satisfies(new NuGetVersion(pkg.Version)))))
-                        if (!vulnDict[pkgId].ContainsKey(cve))
-                            vulnDict[pkgId].Add(cve, ToVulnerability(cve, _nvdDict[pkgId][cve]));
+                        if (!vulnDict[pkgUrl].ContainsKey(cve))
+                            vulnDict[pkgUrl].Add(cve, ToVulnerability(cve, _nvdDict[pkgId][cve]));
                 }
             }
             catch (Exception e)

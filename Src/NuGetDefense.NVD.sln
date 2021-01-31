@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NVDFeedImporter", "NVDFeedI
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NuGetDefense.NVD", "NuGetDefense.NVD\NuGetDefense.NVD.csproj", "{D4E76F4C-5A30-4FC5-A672-037B051B8E30}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NVDFeedImporterTests", "NVDFeedImporterTests\NVDFeedImporterTests.csproj", "{131332DE-CF5B-45F6-A49B-3463A520D33D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NVDFeedTests", "NVDFeedTests\NVDFeedTests.csproj", "{131332DE-CF5B-45F6-A49B-3463A520D33D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

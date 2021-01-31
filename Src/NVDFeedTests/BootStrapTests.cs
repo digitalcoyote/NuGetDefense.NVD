@@ -8,7 +8,7 @@ using NuGetDefense.Core;
 using NuGetDefense.NVD;
 using Xunit;
 
-namespace NVDFeedImporterTests
+namespace NVDFeedTests
 {
     public class BootStrapTests : IAsyncLifetime
     {
