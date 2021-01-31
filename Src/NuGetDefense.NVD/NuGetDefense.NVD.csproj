@@ -22,9 +22,8 @@
     </ItemGroup>    
     <ItemGroup>
       <PackageReference Include="MessagePack" Version="2.2.85" />
-      <PackageReference Include="NuGet.Versioning" Version="5.8.0" />
-      <PackageReference Include="NuGetDefense" Version="2.0.2" />
-      <PackageReference Include="NuGetDefense.Core" Version="2.0.0" />
-      <PackageReference Include="System.Text.Json" Version="5.0.0" />
+      <PackageReference Include="NuGet.Versioning" Version="5.8.1" />
+      <PackageReference Include="NuGetDefense.Core" Version="2.0.1-pre0006" />
+      <PackageReference Include="System.Text.Json" Version="5.0.1" />
     </ItemGroup>
 </Project>

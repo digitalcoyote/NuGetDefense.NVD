@@ -66,7 +66,17 @@ namespace NuGetDefense.NVD
                             cwe = feedVuln.Cve.Problemtype.ProblemtypeData[0].Description[0].Value;
 
                     var description = "";
-                    if (feedVuln.Cve.Description.DescriptionData.Any()) description = feedVuln.Cve.Description.DescriptionData.First().Value;
+                    if (feedVuln.Cve.Description.DescriptionData.Any())
+                    {
+                        if(feedVuln.Cve.CveDataMeta.Id.Equals("log4net", StringComparison.OrdinalIgnoreCase))
+                            foreach (var desc in feedVuln.Cve.Description.DescriptionData)
+                            {
+                                Console.WriteLine(desc);
+                            }
+
+                        Console.WriteLine();
+                        description = feedVuln.Cve.Description.DescriptionData.First().Value;
+                    }
 
                     if (!nvdDict.ContainsKey(cpe.Product))
                         nvdDict.Add(cpe.Product,
