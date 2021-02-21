@@ -59,6 +59,10 @@ namespace NuGetDefense.NVD
                         versions.Add(string.IsNullOrWhiteSpace(range.ToString()) ? "*" : range.ToString());
                         if (versions.Count > 1) versions = versions.Where(s => s != "*").ToList();
                     }
+                    else
+                    {
+                        versions.Add(cpe.ProductVersion);
+                    }
 
                     var cwe = "";
                     if (feedVuln.Cve.Problemtype.ProblemtypeData.Any())
@@ -125,7 +129,8 @@ namespace NuGetDefense.NVD
         public static async IAsyncEnumerable<NVDFeed> GetFeedsAsync()
         {
             var links = GetJsonLinks();
-            for (var index = links.Length - 1; index >= 0; index--)
+            if (links.Length < DateTime.Now.Year - 2001) throw new Exception("Unable to read feeds from NVD");
+            for (var index = 0; index < links.Length; index++)
             {
                 var link = links[index];
                 yield return await GetFeedAsync(link);
@@ -152,7 +157,7 @@ namespace NuGetDefense.NVD
         private static async Task<NVDFeed> GetFeedAsync(string link)
         {
             using var feedDownloader = new WebClient();
-            Stream jsonZippedDataStream = new MemoryStream(feedDownloader.DownloadData(@$"https://nvd.nist.gov{link.Substring(link.IndexOf("https://nvd.nist.gov") + 1)}"));
+            Stream jsonZippedDataStream = new MemoryStream(feedDownloader.DownloadData(@$"https://nvd.nist.gov{link[(link.IndexOf("https://nvd.nist.gov", StringComparison.Ordinal) + 1)..]}"));
             var zipFile = new ZipArchive(jsonZippedDataStream);
             var entryStream = zipFile.Entries[0].Open();
             return await JsonSerializer.DeserializeAsync<NVDFeed>(entryStream, new JsonSerializerOptions());
