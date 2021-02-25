@@ -19,7 +19,7 @@ namespace NuGetDefense.NVD
             BreakIfCannotRun = breakIfCannotRun;
             var lz4Options = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray)
                 .WithSecurity(MessagePackSecurity.UntrustedData);
-            var vulnDataFile = Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory),
+            var vulnDataFile = Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory)!,
                 "VulnerabilityData.bin");
             if (!File.Exists(vulnDataFile))
             {
@@ -80,11 +80,13 @@ namespace NuGetDefense.NVD
                     var pkgId = pkg.Id.ToLower();
                     var pkgUrl = pkg.PackageUrl.ToLower();
                     if (!_nvdDict.ContainsKey(pkgId)) continue;
-                    if (!vulnDict.ContainsKey(pkgUrl)) vulnDict.Add(pkgUrl, new Dictionary<string, Vulnerability>());
                     foreach (var cve in _nvdDict[pkgId].Keys.Where(cve => _nvdDict[pkgId][cve].Versions.Any(v =>
                         VersionRange.Parse(v).Satisfies(new NuGetVersion(pkg.Version)))))
+                    {
+                        if (!vulnDict.ContainsKey(pkgUrl)) vulnDict.Add(pkgUrl, new Dictionary<string, Vulnerability>());
                         if (!vulnDict[pkgUrl].ContainsKey(cve))
                             vulnDict[pkgUrl].Add(cve, ToVulnerability(cve, _nvdDict[pkgId][cve]));
+                    }
                 }
             }
             catch (Exception e)

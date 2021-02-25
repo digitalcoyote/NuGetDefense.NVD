@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -44,7 +45,7 @@ namespace NuGetDefense.NVD
                         if (!string.IsNullOrWhiteSpace(match.VersionEndIncluding))
                         {
                             validNuGetPackage = validNuGetPackage &&
-                                                NuGetVersion.TryParse(match.VersionEndExcluding, out end);
+                                                NuGetVersion.TryParse(match.VersionEndIncluding, out end);
                             includeEnd = true;
                         }
                         else if (!string.IsNullOrWhiteSpace(match.VersionEndExcluding))
@@ -72,14 +73,14 @@ namespace NuGetDefense.NVD
                     var description = "";
                     if (feedVuln.Cve.Description.DescriptionData.Any())
                     {
-                        if(feedVuln.Cve.CveDataMeta.Id.Equals("log4net", StringComparison.OrdinalIgnoreCase))
-                            foreach (var desc in feedVuln.Cve.Description.DescriptionData)
-                            {
-                                Console.WriteLine(desc);
-                            }
+                        var sb = new StringBuilder(feedVuln.Cve.Description.DescriptionData[0].Value);
+                        for (var index = 1; index < feedVuln.Cve.Description.DescriptionData.Length; index++)
+                        {
+                            sb.AppendLine(feedVuln.Cve.Description.DescriptionData[index].Value);
+                        }
 
-                        Console.WriteLine();
-                        description = feedVuln.Cve.Description.DescriptionData.First().Value;
+                        description = sb.ToString();
+
                     }
 
                     if (!nvdDict.ContainsKey(cpe.Product))
@@ -160,6 +161,12 @@ namespace NuGetDefense.NVD
             Stream jsonZippedDataStream = new MemoryStream(feedDownloader.DownloadData(@$"https://nvd.nist.gov{link[(link.IndexOf("https://nvd.nist.gov", StringComparison.Ordinal) + 1)..]}"));
             var zipFile = new ZipArchive(jsonZippedDataStream);
             var entryStream = zipFile.Entries[0].Open();
+            return await JsonSerializer.DeserializeAsync<NVDFeed>(entryStream, new JsonSerializerOptions());
+        }
+
+        public static async Task<NVDFeed> GetFeedFromFile(string file)
+        {
+            Stream entryStream = File.OpenRead(file);
             return await JsonSerializer.DeserializeAsync<NVDFeed>(entryStream, new JsonSerializerOptions());
         }
     }
