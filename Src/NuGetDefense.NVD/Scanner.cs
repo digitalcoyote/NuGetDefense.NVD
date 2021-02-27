@@ -81,7 +81,7 @@ namespace NuGetDefense.NVD
                     var pkgUrl = pkg.PackageUrl.ToLower();
                     if (!_nvdDict.ContainsKey(pkgId)) continue;
                     foreach (var cve in _nvdDict[pkgId].Keys.Where(cve => _nvdDict[pkgId][cve].Versions.Any(v =>
-                        VersionRange.Parse(v).Satisfies(new NuGetVersion(pkg.Version)))))
+                        VersionRange.Parse(v.Replace('_','-')).Satisfies(new NuGetVersion(pkg.Version)))))
                     {
                         if (!vulnDict.ContainsKey(pkgUrl)) vulnDict.Add(pkgUrl, new Dictionary<string, Vulnerability>());
                         if (!vulnDict[pkgUrl].ContainsKey(cve))
