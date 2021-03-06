@@ -33,6 +33,9 @@
       <None Update="TestFiles\nvdcve-bootstrap.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="TestFiles\nvdcve-System.Net.Http.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

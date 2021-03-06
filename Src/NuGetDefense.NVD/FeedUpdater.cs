@@ -22,13 +22,14 @@ namespace NuGetDefense.NVD
         {
             foreach (var feedVuln in feed.CveItems)
             {
-                var versions = new List<string>();
+                var versionsDict = new Dictionary<string, List<string>>();
                 var validNuGetPackage = true;
                 foreach (var match in feedVuln.Configurations.Nodes.Where(n => n.CpeMatch != null)
                     .SelectMany(n => n.CpeMatch))
                 {
                     var cpe = Cpe.Parse(match.Cpe23Uri);
                     if (cpe.Part != "a") continue;
+                    if(!versionsDict.ContainsKey(cpe.Product)) versionsDict.Add(cpe.Product, new List<string>());
                     if (cpe.ProductVersion == "-" || cpe.ProductVersion == "*")
                     {
                         NuGetVersion start = null;
@@ -57,12 +58,12 @@ namespace NuGetDefense.NVD
                         if (!validNuGetPackage) continue;
                         var range = new VersionRange(start, includeStart, end, includeEnd);
 
-                        versions.Add(string.IsNullOrWhiteSpace(range.ToString()) ? "*" : range.ToString());
-                        if (versions.Count > 1) versions = versions.Where(s => s != "*").ToList();
+                        versionsDict[cpe.Product].Add(string.IsNullOrWhiteSpace(range.ToString()) ? "*" : range.ToString());
+                        if (versionsDict[cpe.Product].Count > 1) versionsDict[cpe.Product] = versionsDict[cpe.Product].Where(s => s != "*").ToList();
                     }
                     else
                     {
-                        versions.Add(cpe.ProductVersion);
+                        versionsDict[cpe.Product].Add(cpe.ProductVersion);
                     }
 
                     var cwe = "";
@@ -92,7 +93,7 @@ namespace NuGetDefense.NVD
                             feedVuln.Impact.BaseMetricV3?.CvssV3?.AttackVector, out var vector);
                         nvdDict[cpe.Product].Add(feedVuln.Cve.CveDataMeta.Id, new VulnerabilityEntry
                             {
-                                Versions = versions.ToArray(),
+                                Versions = versionsDict[cpe.Product].ToArray(),
                                 Description = description,
                                 Cwe = cwe,
                                 Vendor = cpe.Vendor,
@@ -106,8 +107,8 @@ namespace NuGetDefense.NVD
                     else
                     {
                         var vuln = nvdDict[cpe.Product][feedVuln.Cve.CveDataMeta.Id];
-                        var versionList = vuln.Versions.Union(versions);
-                        vuln.Versions = versionList.ToArray();
+                        vuln.Versions = vuln.Versions.Union(versionsDict[cpe.Product]).ToArray();
+                        nvdDict[cpe.Product][feedVuln.Cve.CveDataMeta.Id] = vuln;
                     }
                 }
             }
