@@ -9,9 +9,9 @@ using Xunit;
 
 namespace NVDFeedTests
 {
-    public class SystemNetHttpTests : IAsyncLifetime
+    public class JQueryCpeParsingTests : IAsyncLifetime
     {
-        private const string SystemNetHttpTestFeedFile = "./TestFiles/nvdcve-System.Net.Http.json";
+        private const string SystemNetHttpTestFeedFile = "./TestFiles/nvdcve-JQuery.json";
         private NVDFeed _systemNetHttpTestFeed;
         private Dictionary<string, Dictionary<string, VulnerabilityEntry>> _vulnDict;
 
@@ -33,13 +33,12 @@ namespace NVDFeedTests
         }
         
         [Fact]
-        public void CorrectSystemNetHttpVulnerabilityVersions()
+        public void CorrectJQueryVulnerabilityVersions()
         {
-            var versions = _vulnDict["system.net.http"]["CVE-2017-0249"].Versions;
+            var versions = _vulnDict["jquery"]["CVE-2016-10707"].Versions;
             var expectedVersions = new[]
             {
-                "[4.1.1]",
-                "[4.3.1]"
+               "[3.0.0-rc1]"
             };
             Assert.False(versions.Except(expectedVersions).Any());
         }

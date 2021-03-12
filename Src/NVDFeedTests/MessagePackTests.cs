@@ -9,9 +9,9 @@ using Xunit;
 
 namespace NVDFeedTests
 {
-    public class SystemNetHttpTests : IAsyncLifetime
+    public class MessagePackTests : IAsyncLifetime
     {
-        private const string SystemNetHttpTestFeedFile = "./TestFiles/nvdcve-System.Net.Http.json";
+        private const string SystemNetHttpTestFeedFile = "./TestFiles/nvdcve-MessagePack.json";
         private NVDFeed _systemNetHttpTestFeed;
         private Dictionary<string, Dictionary<string, VulnerabilityEntry>> _vulnDict;
 
@@ -33,13 +33,20 @@ namespace NVDFeedTests
         }
         
         [Fact]
-        public void CorrectSystemNetHttpVulnerabilityVersions()
+        public void CorrectMessagePackVulnerabilityVersions()
         {
-            var versions = _vulnDict["system.net.http"]["CVE-2017-0249"].Versions;
+            var versions = _vulnDict["messagepack"]["CVE-2020-5234"].Versions;
             var expectedVersions = new[]
             {
-                "[4.1.1]",
-                "[4.3.1]"
+                "(, 1.9.3)",
+                "[2.0.94-alpha]",
+                "[2.0.110-alpha]",
+                "[2.0.119-beta]",
+                "[2.0.123-beta]",
+                "[2.0.204-beta]",
+                "[2.0.270-rc]",
+                "[2.0.299-rc]",
+                "[2.0.323, 2.1.80)"
             };
             Assert.False(versions.Except(expectedVersions).Any());
         }

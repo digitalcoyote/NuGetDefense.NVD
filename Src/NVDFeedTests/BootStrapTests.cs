@@ -37,12 +37,21 @@ namespace NVDFeedTests
         public void CorrectVulnerabilityVersions()
         {
             var versions = _vulnDict.FindCve("CVE-2018-14040")?.Versions;
-            var ExpectedVersions = new[]
+            var expectedVersions = new[]
             {
                 "[4.0.0, 4.1.2)",
-                "(, 3.4.0)"
+                "(, 3.4.0)",
+                "[4.0.0-alpha]",
+                "[4.0.0-alpha2]",
+                "[4.0.0-alpha3]",
+                "[4.0.0-alpha4]",
+                "[4.0.0-alpha5]",
+                "[4.0.0-alpha6]",
+                "[4.0.0-beta]",
+                "[4.0.0-beta2]",
+                "[4.0.0-beta3]"
             };
-            Assert.False(versions.Except(ExpectedVersions).Any());
+            Assert.False(versions.Except(expectedVersions).Any());
         }
     }
 }
