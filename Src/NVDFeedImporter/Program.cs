@@ -13,14 +13,13 @@ namespace NVDFeedImporter
 
         private static async Task Main(string[] args)
         {
-            var outPath = BinName;
-            if (args.Length > 0) outPath = Path.Combine(args[0], BinName);
             var vulnDict =
                 new Dictionary<string, Dictionary<string, VulnerabilityEntry>>();
             await foreach (var feed in FeedUpdater.GetFeedsAsync())
                 FeedUpdater.AddFeedToVulnerabilityData(feed, vulnDict);
             vulnDict.MakeCorrections();
-            VulnerabilityData.SaveToBinFile(vulnDict, outPath, TimeSpan.FromMinutes(10));
+
+            for (var index = 0; index < args.Length; index++) VulnerabilityData.SaveToBinFile(vulnDict, Path.Combine(args[index], BinName), TimeSpan.FromMinutes(10));
         }
     }
 }
