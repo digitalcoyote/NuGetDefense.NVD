@@ -63,7 +63,7 @@ namespace NuGetDefense.NVD
                     }
                     else
                     {
-                        versionsDict[cpe.Product].Add(cpe.ProductVersion);
+                        versionsDict[cpe.Product].Add(String.IsNullOrWhiteSpace(cpe.Update) || cpe.Update == "*" ? $"[{cpe.ProductVersion}]" : $"[{cpe.ProductVersion}-{cpe.Update}]");
                     }
 
                     var cwe = "";

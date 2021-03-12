@@ -9,9 +9,9 @@ using Xunit;
 
 namespace NVDFeedTests
 {
-    public class SystemNetHttpTests : IAsyncLifetime
+    public class Log4NetCpeParsingTests : IAsyncLifetime
     {
-        private const string SystemNetHttpTestFeedFile = "./TestFiles/nvdcve-System.Net.Http.json";
+        private const string SystemNetHttpTestFeedFile = "./TestFiles/nvdcve-Log4Net.json";
         private NVDFeed _systemNetHttpTestFeed;
         private Dictionary<string, Dictionary<string, VulnerabilityEntry>> _vulnDict;
 
@@ -33,13 +33,12 @@ namespace NVDFeedTests
         }
         
         [Fact]
-        public void CorrectSystemNetHttpVulnerabilityVersions()
+        public void CorrectLog4NetVulnerabilityVersions()
         {
-            var versions = _vulnDict["system.net.http"]["CVE-2017-0249"].Versions;
+            var versions = _vulnDict["log4net"]["CVE-2018-1285"].Versions;
             var expectedVersions = new[]
             {
-                "[4.1.1]",
-                "[4.3.1]"
+                "(, 2.0.8]"
             };
             Assert.False(versions.Except(expectedVersions).Any());
         }

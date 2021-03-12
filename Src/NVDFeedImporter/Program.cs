@@ -19,6 +19,7 @@ namespace NVDFeedImporter
                 new Dictionary<string, Dictionary<string, VulnerabilityEntry>>();
             await foreach (var feed in FeedUpdater.GetFeedsAsync())
                 FeedUpdater.AddFeedToVulnerabilityData(feed, vulnDict);
+            vulnDict.MakeCorrections();
             VulnerabilityData.SaveToBinFile(vulnDict, outPath, TimeSpan.FromMinutes(10));
         }
     }

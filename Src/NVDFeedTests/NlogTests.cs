@@ -1,17 +1,17 @@
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using NuGetDefense;
 using NuGetDefense.NVD;
+using NVDFeedImporter;
 using Xunit;
 
 namespace NVDFeedTests
 {
-    public class SystemNetHttpTests : IAsyncLifetime
+    public class NLogTests : IAsyncLifetime
     {
-        private const string SystemNetHttpTestFeedFile = "./TestFiles/nvdcve-System.Net.Http.json";
+        private const string SystemNetHttpTestFeedFile = "./TestFiles/nvdcve-NLog.json";
         private NVDFeed _systemNetHttpTestFeed;
         private Dictionary<string, Dictionary<string, VulnerabilityEntry>> _vulnDict;
 
@@ -24,6 +24,7 @@ namespace NVDFeedTests
                 _vulnDict =
                     new Dictionary<string, Dictionary<string, VulnerabilityEntry>>();
                 FeedUpdater.AddFeedToVulnerabilityData(_systemNetHttpTestFeed, _vulnDict);
+                _vulnDict.MakeCorrections();
             });
         }
 
@@ -33,15 +34,9 @@ namespace NVDFeedTests
         }
         
         [Fact]
-        public void CorrectSystemNetHttpVulnerabilityVersions()
+        public void CorrectNLogVulnerabilityVersions()
         {
-            var versions = _vulnDict["system.net.http"]["CVE-2017-0249"].Versions;
-            var expectedVersions = new[]
-            {
-                "[4.1.1]",
-                "[4.3.1]"
-            };
-            Assert.False(versions.Except(expectedVersions).Any());
+            Assert.Empty(_vulnDict["nlog"]);
         }
     }
 }
