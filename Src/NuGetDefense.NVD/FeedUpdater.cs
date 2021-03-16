@@ -29,7 +29,7 @@ namespace NuGetDefense.NVD
                 {
                     var cpe = Cpe.Parse(match.Cpe23Uri);
                     if (cpe.Part != "a") continue;
-                    if(!versionsDict.ContainsKey(cpe.Product)) versionsDict.Add(cpe.Product, new List<string>());
+                    if (!versionsDict.ContainsKey(cpe.Product)) versionsDict.Add(cpe.Product, new List<string>());
                     if (cpe.ProductVersion == "-" || cpe.ProductVersion == "*")
                     {
                         NuGetVersion start = null;
@@ -57,13 +57,36 @@ namespace NuGetDefense.NVD
 
                         if (!validNuGetPackage) continue;
                         var range = new VersionRange(start, includeStart, end, includeEnd);
+                        if (NuGetVersion.TryParse(cpe.ProductVersion, out _))
 
-                        versionsDict[cpe.Product].Add(string.IsNullOrWhiteSpace(range.ToString()) ? "*" : range.ToString());
-                        if (versionsDict[cpe.Product].Count > 1) versionsDict[cpe.Product] = versionsDict[cpe.Product].Where(s => s != "*").ToList();
+                            versionsDict[cpe.Product].Add(string.IsNullOrWhiteSpace(range.ToString()) ? "*" : range.ToString());
+                        if (versionsDict[cpe.Product].Count > 1)
+                            versionsDict[cpe.Product] = versionsDict[cpe.Product].Where(s => s != "*").Select(v =>
+                            {
+                                if (!VersionRange.TryParse(v, out _))
+                                {
+                                    var offset = v.TakeWhile(c => char.IsNumber(c) || c == '.').Count();
+                                    v = v.Insert(offset, "-");
+                                }
+
+                                return v;
+                            }).ToList();
                     }
                     else
                     {
-                        versionsDict[cpe.Product].Add(String.IsNullOrWhiteSpace(cpe.Update) || cpe.Update == "*" ? $"[{cpe.ProductVersion}]" : $"[{cpe.ProductVersion}-{cpe.Update}]");
+                        if (Regex.IsMatch(cpe.Update, @"[^a-zA-Z\d]"))
+                            continue;
+
+                        var version = string.IsNullOrWhiteSpace(cpe.Update) || cpe.Update == "*" ? $"[{cpe.ProductVersion}]" : $"[{cpe.ProductVersion}-{cpe.Update}]";
+
+                        //TODO: potentially validate with Regex instead
+                        if (!VersionRange.TryParse(version, out _))
+                        {
+                            var offset = cpe.ProductVersion.TakeWhile(c => char.IsNumber(c) || c == '.').Count();
+                            version = cpe.ProductVersion.Insert(offset, "-");
+                        }
+
+                        versionsDict[cpe.Product].Add(version);
                     }
 
                     var cwe = "";
@@ -75,13 +98,24 @@ namespace NuGetDefense.NVD
                     if (feedVuln.Cve.Description.DescriptionData.Any())
                     {
                         var sb = new StringBuilder(feedVuln.Cve.Description.DescriptionData[0].Value);
-                        for (var index = 1; index < feedVuln.Cve.Description.DescriptionData.Length; index++)
-                        {
-                            sb.AppendLine(feedVuln.Cve.Description.DescriptionData[index].Value);
-                        }
+                        for (var index = 1; index < feedVuln.Cve.Description.DescriptionData.Length; index++) sb.AppendLine(feedVuln.Cve.Description.DescriptionData[index].Value);
 
                         description = sb.ToString();
+                    }
 
+                    foreach (var (key, _) in versionsDict)
+                    {
+                        var changed = false;
+                        foreach (var version in versionsDict[key])
+                            if (!VersionRange.TryParse(version, out _))
+                            {
+                                Console.WriteLine($"{cpe.Product}: {version} is not parsable as a NuGetVersion String and is not being listed as a version for {feedVuln.Cve.CveDataMeta.Id}");
+                                var offset = version.TakeWhile(c => char.IsNumber(c) || c == '.').Count();
+                                var insert = version.Insert(offset, "-");
+                                changed = true;
+                            }
+
+                        if (changed) versionsDict[key] = versionsDict[key].Where(v => VersionRange.TryParse(v, out _)).ToList();
                     }
 
                     if (!nvdDict.ContainsKey(cpe.Product))
@@ -124,7 +158,7 @@ namespace NuGetDefense.NVD
             var feedsPage = client.DownloadString("https://nvd.nist.gov/vuln/data-feeds");
             var ls = Regex.Matches(feedsPage,
                 linkRegex,
-                RegexOptions.Singleline).Cast<Match>().Select(m => m.ToString()).ToImmutableArray();
+                RegexOptions.Singleline).Select(m => m.ToString()).ToImmutableArray();
             return ls;
         }
 
@@ -159,7 +193,8 @@ namespace NuGetDefense.NVD
         private static async Task<NVDFeed> GetFeedAsync(string link)
         {
             using var feedDownloader = new WebClient();
-            Stream jsonZippedDataStream = new MemoryStream(feedDownloader.DownloadData(@$"https://nvd.nist.gov{link[(link.IndexOf("https://nvd.nist.gov", StringComparison.Ordinal) + 1)..]}"));
+            Stream jsonZippedDataStream =
+                new MemoryStream(feedDownloader.DownloadData(@$"https://nvd.nist.gov{link[(link.IndexOf("https://nvd.nist.gov", StringComparison.Ordinal) + 1)..]}"));
             var zipFile = new ZipArchive(jsonZippedDataStream);
             var entryStream = zipFile.Entries[0].Open();
             return await JsonSerializer.DeserializeAsync<NVDFeed>(entryStream, new JsonSerializerOptions());
