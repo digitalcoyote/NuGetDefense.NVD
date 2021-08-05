@@ -72,10 +72,9 @@ namespace NuGetDefense.NVD
                                 return v;
                             }).ToList();
                     }
-                    else
+                    else if (Regex.IsMatch(cpe.Update, @"[^a-zA-Z\d]"))
                     {
-                        if (Regex.IsMatch(cpe.Update, @"[^a-zA-Z\d]"))
-                            continue;
+                        
 
                         var version = string.IsNullOrWhiteSpace(cpe.Update) || cpe.Update == "*" ? $"[{cpe.ProductVersion}]" : $"[{cpe.ProductVersion}-{cpe.Update}]";
 
