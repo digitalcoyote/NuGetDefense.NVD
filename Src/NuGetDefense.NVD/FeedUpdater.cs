@@ -29,8 +29,8 @@ namespace NuGetDefense.NVD
                 {
                     var cpe = Cpe.Parse(match.Cpe23Uri);
                     if (cpe.Part != "a") continue;
-                    if (!versionsDict.ContainsKey(cpe.Product)) versionsDict.Add(cpe.Product, new List<string>());
-                    if (cpe.ProductVersion == "-" || cpe.ProductVersion == "*")
+                    if (!versionsDict.ContainsKey(cpe.Product)) versionsDict.Add(cpe.Product, new());
+                    if (cpe.ProductVersion is "-" or "*")
                     {
                         NuGetVersion start = null;
                         NuGetVersion end = null;
@@ -119,12 +119,12 @@ namespace NuGetDefense.NVD
 
                     if (!nvdDict.ContainsKey(cpe.Product))
                         nvdDict.Add(cpe.Product,
-                            new Dictionary<string, VulnerabilityEntry>());
+                            new());
                     if (!nvdDict[cpe.Product].ContainsKey(feedVuln.Cve.CveDataMeta.Id))
                     {
                         var specifiedVector = Enum.TryParse<Vulnerability.AccessVectorType>(
                             feedVuln.Impact.BaseMetricV3?.CvssV3?.AttackVector, out var vector);
-                        nvdDict[cpe.Product].Add(feedVuln.Cve.CveDataMeta.Id, new VulnerabilityEntry
+                        nvdDict[cpe.Product].Add(feedVuln.Cve.CveDataMeta.Id, new()
                             {
                                 Versions = versionsDict[cpe.Product].ToArray(),
                                 Description = description,
@@ -164,7 +164,7 @@ namespace NuGetDefense.NVD
         public static async IAsyncEnumerable<NVDFeed> GetFeedsAsync()
         {
             var links = GetJsonLinks();
-            if (links.Length < DateTime.Now.Year - 2001) throw new Exception("Unable to read feeds from NVD");
+            if (links.Length < DateTime.Now.Year - 2001) throw new("Unable to read feeds from NVD");
             for (var index = 0; index < links.Length; index++)
             {
                 var link = links[index];
@@ -196,13 +196,13 @@ namespace NuGetDefense.NVD
                 new MemoryStream(feedDownloader.DownloadData(@$"https://nvd.nist.gov{link[(link.IndexOf("https://nvd.nist.gov", StringComparison.Ordinal) + 1)..]}"));
             var zipFile = new ZipArchive(jsonZippedDataStream);
             var entryStream = zipFile.Entries[0].Open();
-            return await JsonSerializer.DeserializeAsync<NVDFeed>(entryStream, new JsonSerializerOptions());
+            return await JsonSerializer.DeserializeAsync<NVDFeed>(entryStream, new());
         }
 
         public static async Task<NVDFeed> GetFeedFromFile(string file)
         {
             Stream entryStream = File.OpenRead(file);
-            return await JsonSerializer.DeserializeAsync<NVDFeed>(entryStream, new JsonSerializerOptions());
+            return await JsonSerializer.DeserializeAsync<NVDFeed>(entryStream, new());
         }
     }
 }
