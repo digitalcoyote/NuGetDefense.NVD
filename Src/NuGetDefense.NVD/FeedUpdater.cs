@@ -196,13 +196,13 @@ namespace NuGetDefense.NVD
                 new MemoryStream(feedDownloader.DownloadData(@$"https://nvd.nist.gov{link[(link.IndexOf("https://nvd.nist.gov", StringComparison.Ordinal) + 1)..]}"));
             var zipFile = new ZipArchive(jsonZippedDataStream);
             var entryStream = zipFile.Entries[0].Open();
-            return await JsonSerializer.DeserializeAsync<NVDFeed>(entryStream, new());
+            return await JsonSerializer.DeserializeAsync<NVDFeed>(entryStream, new JsonSerializerOptions());
         }
 
         public static async Task<NVDFeed> GetFeedFromFile(string file)
         {
             Stream entryStream = File.OpenRead(file);
-            return await JsonSerializer.DeserializeAsync<NVDFeed>(entryStream, new());
+            return await JsonSerializer.DeserializeAsync<NVDFeed>(entryStream, new JsonSerializerOptions());
         }
     }
 }

@@ -74,16 +74,16 @@ namespace NuGetDefense.NVD
         {
             try
             {
-                vulnDict ??= new Dictionary<string, Dictionary<string, Vulnerability>>();
+                vulnDict ??= new();
                 foreach (var pkg in pkgs)
                 {
                     var pkgId = pkg.Id.ToLower();
                     var pkgUrl = pkg.PackageUrl.ToLower();
                     if (!_nvdDict.ContainsKey(pkgId)) continue;
                     foreach (var cve in _nvdDict[pkgId].Keys.Where(cve => _nvdDict[pkgId][cve].Versions.Any(v =>
-                        VersionRange.Parse(v.Replace('_','-')).Satisfies(new NuGetVersion(pkg.Version)))))
+                        VersionRange.Parse(v.Replace('_','-')).Satisfies(new(pkg.Version)))))
                     {
-                        if (!vulnDict.ContainsKey(pkgUrl)) vulnDict.Add(pkgUrl, new Dictionary<string, Vulnerability>());
+                        if (!vulnDict.ContainsKey(pkgUrl)) vulnDict.Add(pkgUrl, new());
                         if (!vulnDict[pkgUrl].ContainsKey(cve))
                             vulnDict[pkgUrl].Add(cve, ToVulnerability(cve, _nvdDict[pkgId][cve]));
                     }
@@ -101,7 +101,7 @@ namespace NuGetDefense.NVD
         public Vulnerability ToVulnerability(string cve,
             VulnerabilityEntry vulnerability)
         {
-            return new Vulnerability(
+            return new(
                 cve,
                 vulnerability.Score ?? -1,
                 vulnerability.Cwe,

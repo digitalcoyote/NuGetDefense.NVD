@@ -2,7 +2,10 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
-        <LangVersion>9</LangVersion>
+        <LangVersion>10</LangVersion>
+        <PackageVersion>2.0.7</PackageVersion>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
     <PropertyGroup>
         <Authors>Curtis Carter</Authors>
@@ -16,14 +19,18 @@
         <PackageTags>Security</PackageTags>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIcon>icon.png</PackageIcon>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
     <ItemGroup>
         <None Include="icon.png" Pack="true" PackagePath="\" />
     </ItemGroup>    
     <ItemGroup>
-      <PackageReference Include="MessagePack" Version="2.3.75" />
-      <PackageReference Include="NuGet.Versioning" Version="5.10.0" />
-      <PackageReference Include="NuGetDefense.Core" Version="2.0.2" />
-      <PackageReference Include="System.Text.Json" Version="5.0.2" />
+      <PackageReference Include="MessagePack" Version="2.3.112" />
+      <PackageReference Include="NuGet.Versioning" Version="6.2.1" />
+      <PackageReference Include="NuGetDefense.Core" Version="2.0.3" />
+      <PackageReference Include="System.Text.Json" Version="6.0.5" />
     </ItemGroup>
 </Project>

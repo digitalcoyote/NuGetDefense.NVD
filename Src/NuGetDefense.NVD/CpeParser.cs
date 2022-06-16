@@ -26,7 +26,7 @@ namespace NVDFeedImporter
             // All we really care about is product and version (maybe vendor) of CPE's with "part" a (application)
             var cpeParts = cpeString.Split(':');
 
-            return new Cpe
+            return new()
             {
                 CpeVersion = cpeParts[1],
                 Part = cpeParts[2],

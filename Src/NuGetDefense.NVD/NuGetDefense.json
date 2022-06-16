@@ -4,6 +4,7 @@
     "OutputTextReport": true
   },
   "CheckTransitiveDependencies": true,
+  "CheckReferencedProjects": false,
   "ErrorSettings": {
     "ErrorSeverityThreshold": "any",
     "Cvss3Threshold": -1,
@@ -21,6 +22,12 @@
     "Username": "",
     "Enabled": true,
     "BreakIfCannotRun": true
+  },
+  "GitHubAdvisoryDatabase": {
+    "ApiToken": "",
+    "Username": "",
+    "Enabled": true,
+    "BreakIfCannotRun": false
   },
   "NVD": {
     "SelfUpdate": false,

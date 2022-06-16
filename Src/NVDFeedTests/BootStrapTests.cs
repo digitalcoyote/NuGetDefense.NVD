@@ -23,7 +23,7 @@ namespace NVDFeedTests
                 using var fs = File.OpenRead(BoostrapTestFeedFile);
                 _boostrapTestFeed = JsonSerializer.DeserializeAsync<NVDFeed>(fs).Result;
                 _vulnDict =
-                    new Dictionary<string, Dictionary<string, VulnerabilityEntry>>();
+                    new();
                 FeedUpdater.AddFeedToVulnerabilityData(_boostrapTestFeed, _vulnDict);
             });
         }

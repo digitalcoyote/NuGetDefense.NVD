@@ -19,7 +19,11 @@ namespace NVDFeedImporter
                 FeedUpdater.AddFeedToVulnerabilityData(feed, vulnDict);
             vulnDict.MakeCorrections();
 
-            for (var index = 0; index < args.Length; index++) VulnerabilityData.SaveToBinFile(vulnDict, Path.Combine(args[index], BinName), TimeSpan.FromMinutes(10));
+            for (var index = 0; index < args.Length; index++)
+            {
+                if(Directory.Exists(args[index]))
+                    VulnerabilityData.SaveToBinFile(vulnDict, Path.Combine(args[index], BinName), TimeSpan.FromMinutes(10));
+            }
         }
     }
 }

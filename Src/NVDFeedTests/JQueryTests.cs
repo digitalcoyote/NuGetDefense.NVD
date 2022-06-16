@@ -22,7 +22,7 @@ namespace NVDFeedTests
                 using var fs = File.OpenRead(SystemNetHttpTestFeedFile);
                 _systemNetHttpTestFeed = JsonSerializer.DeserializeAsync<NVDFeed>(fs).Result;
                 _vulnDict =
-                    new Dictionary<string, Dictionary<string, VulnerabilityEntry>>();
+                    new();
                 FeedUpdater.AddFeedToVulnerabilityData(_systemNetHttpTestFeed, _vulnDict);
             });
         }
