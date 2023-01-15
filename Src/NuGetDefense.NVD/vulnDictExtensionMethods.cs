@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using NuGetDefense;
 
 namespace NuGetDefense.NVD
@@ -18,8 +19,28 @@ namespace NuGetDefense.NVD
             
             if (vulnDict.ContainsKey("chakracore"))
             {
-                // ChakraCore's nuget package is Microsoft.ChakraCore
-                vulnDict.Add("microsoft.chakracore", vulnDict["chakracore"]);
+                if (!vulnDict.ContainsKey("microsoft.chakracore"))
+                {
+                    // ChakraCore's nuget package is Microsoft.ChakraCore
+                    vulnDict.Add("microsoft.chakracore", vulnDict["chakracore"]);
+                }
+                else
+                {
+                    // If updating, we add the new chakracore vulns to microsoft.chakracore
+                    foreach (var key in vulnDict["chakracore"].Keys)
+                    {
+                        if (vulnDict["microsoft.chakracore"].ContainsKey(key))
+                        {
+                            vulnDict["microsoft.chakracore"][key] = vulnDict["chakracore"][key];
+                        }
+                        else
+                        {
+                            vulnDict["microsoft.chakracore"].Add(key, vulnDict["chakracore"][key]);
+                        }
+
+                    }
+                }
+
                 vulnDict.Remove("chakracore");
             }
         }
