@@ -145,6 +145,7 @@ namespace NuGetDefense.NVD
                     }
                 }
             }
+            nvdDict.MakeCorrections();
         }
 
         public static ImmutableArray<string> GetJsonLinks(string linkRegex = "")
