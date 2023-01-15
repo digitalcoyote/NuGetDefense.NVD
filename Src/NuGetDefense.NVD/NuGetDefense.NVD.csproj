@@ -23,6 +23,7 @@
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
     <ItemGroup>
         <None Include="icon.png" Pack="true" PackagePath="\" />
@@ -32,5 +33,10 @@
       <PackageReference Include="NuGet.Versioning" Version="6.4.0" />
       <PackageReference Include="NuGetDefense.Core" Version="2.0.4" />
       <PackageReference Include="System.Text.Json" Version="7.0.1" />
+    </ItemGroup>    
+    <ItemGroup>
+      <Content Include="..\..\README.md" Pack="true" PackagePath="\">
+        <Link>README.md</Link>
+      </Content>
     </ItemGroup>
 </Project>
