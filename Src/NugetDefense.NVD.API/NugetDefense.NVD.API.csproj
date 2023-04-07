@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>NugetDefense.NVD.API</AssemblyName>
+        <RootNamespace>NugetDefense.NVD.API</RootNamespace>
+        <LangVersion>default</LangVersion>
+        <Version>0.0.1-alpha</Version>
+        <Title>NugetDefense.NVD.API</Title>
+        <Description>A NVD 2.0 API client written for NuGetDefense. This product uses the NVD API but is not endorsed or certified by the NVD.</Description>
+        <Copyright>Curtis Carter 2023</Copyright>
+        <PackageProjectUrl>https://digitalcoyote.github.io/NuGetDefense/</PackageProjectUrl>
+        <PackageIcon>icon.png</PackageIcon>
+        <RepositoryUrl>https://github.com/digitalcoyote/NuGetDefense.NVD</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>security nvd vulnerability client</PackageTags>
+        <PackageReleaseNotes>Initial Prerelase</PackageReleaseNotes>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <None Include="..\NuGetDefense.NVD\icon.png">
+        <Pack>True</Pack>
+        <PackagePath></PackagePath>
+        <Link>icon.png</Link>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="System.Net.Http.Json" Version="7.0.1" />
+    </ItemGroup>
+
+</Project>
