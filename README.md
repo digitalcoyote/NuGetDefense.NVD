@@ -5,7 +5,8 @@
 NuGetDefense.NVD contains the NVD Feed parsing/scanning functionality from NuGetDefense.
   
 ## Features  
-* Downloading NVD Feeds
+* NVD 2.0 API Client
+    * This product uses the NVD API but is not endorsed or certified by the NVD.
 * Parsing/Filtering NVD Feeds
 
 ## Problems?
