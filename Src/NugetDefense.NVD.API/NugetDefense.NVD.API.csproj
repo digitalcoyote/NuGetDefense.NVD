@@ -20,15 +20,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <None Include="..\NuGetDefense.NVD\icon.png">
-        <Pack>True</Pack>
-        <PackagePath></PackagePath>
-        <Link>icon.png</Link>
-      </None>
+        <None Include="..\NuGetDefense.NVD\icon.png">
+            <Pack>True</Pack>
+            <PackagePath></PackagePath>
+            <Link>icon.png</Link>
+        </None>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="System.Net.Http.Json" Version="7.0.1" />
+        <PackageReference Include="System.Net.Http.Json" Version="7.0.1"/>
     </ItemGroup>
 
 </Project>

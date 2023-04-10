@@ -2,12 +2,12 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <LangVersion>10</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\NuGetDefense.NVD\NuGetDefense.NVD.csproj" />
+        <ProjectReference Include="..\NuGetDefense.NVD\NuGetDefense.NVD.csproj"/>
     </ItemGroup>
 
 </Project>

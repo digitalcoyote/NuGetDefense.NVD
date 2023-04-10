@@ -4,5 +4,5 @@ public enum CvssV2Severity
 {
     Low,
     Medium,
-    High,
+    High
 }

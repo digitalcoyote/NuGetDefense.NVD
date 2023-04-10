@@ -5,25 +5,22 @@ using System.Threading.Tasks;
 using NuGetDefense;
 using NuGetDefense.NVD;
 
-namespace NVDFeedImporter
+namespace NVDFeedImporter;
+
+internal class Program
 {
-    internal class Program
+    private const string BinName = "VulnerabilityData.bin";
+
+    private static async Task Main(string[] args)
     {
-        private const string BinName = "VulnerabilityData.bin";
+        var vulnDict =
+            new Dictionary<string, Dictionary<string, VulnerabilityEntry>>();
+        await foreach (var feed in FeedUpdater.GetFeedsAsync())
+            FeedUpdater.AddFeedToVulnerabilityData(feed, vulnDict);
+        vulnDict.MakeCorrections();
 
-        private static async Task Main(string[] args)
-        {
-            var vulnDict =
-                new Dictionary<string, Dictionary<string, VulnerabilityEntry>>();
-            await foreach (var feed in FeedUpdater.GetFeedsAsync())
-                FeedUpdater.AddFeedToVulnerabilityData(feed, vulnDict);
-            vulnDict.MakeCorrections();
-
-            for (var index = 0; index < args.Length; index++)
-            {
-                if(Directory.Exists(args[index]))
-                    VulnerabilityData.SaveToBinFile(vulnDict, Path.Combine(args[index], BinName), TimeSpan.FromMinutes(10));
-            }
-        }
+        for (var index = 0; index < args.Length; index++)
+            if (Directory.Exists(args[index]))
+                VulnerabilityData.SaveToBinFile(vulnDict, Path.Combine(args[index], BinName), TimeSpan.FromMinutes(10));
     }
 }

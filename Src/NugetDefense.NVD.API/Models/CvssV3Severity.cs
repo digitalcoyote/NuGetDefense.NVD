@@ -5,5 +5,5 @@ public enum CvssV3Severity
     Low,
     Medium,
     High,
-    Critical,
+    Critical
 }

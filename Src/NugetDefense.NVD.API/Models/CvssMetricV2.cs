@@ -8,14 +8,14 @@ public class CvssMetricV2
 
     [JsonPropertyName("type")] public string? Type { get; set; }
 
-    [JsonPropertyName("cvssData")] public CvssData? CvssData { get; set; }
+    [JsonPropertyName("cvssData")] public CvssDataV2? CvssData { get; set; }
 
     [JsonPropertyName("baseSeverity")] public string? BaseSeverity { get; set; }
 
     [JsonPropertyName("exploitabilityScore")]
-    public long ExploitabilityScore { get; set; }
+    public double ExploitabilityScore { get; set; }
 
-    [JsonPropertyName("impactScore")] public long ImpactScore { get; set; }
+    [JsonPropertyName("impactScore")] public double ImpactScore { get; set; }
 
     [JsonPropertyName("acInsufInfo")] public bool AcInsufInfo { get; set; }
 

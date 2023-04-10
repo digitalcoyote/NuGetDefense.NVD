@@ -9,8 +9,9 @@ public class Node
     [JsonPropertyName("negate")] public bool Negate { get; set; }
 
     /// <summary>
-    /// Contains the CPE Match Criteria, the criteria's unique identifier,
-    /// and a statement of whether the criteria is vulnerable.
+    ///     Contains the CPE Match Criteria, the criteria's unique identifier,
+    ///     and a statement of whether the criteria is vulnerable.
     /// </summary>
-    [JsonPropertyName("cpeMatch")] public CpeMatch[]? CpeMatch { get; set; }
+    [JsonPropertyName("cpeMatch")]
+    public CpeMatch[] CpeMatch { get; set; }
 }

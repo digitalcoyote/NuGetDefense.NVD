@@ -8,5 +8,5 @@ public class Weakness
 
     [JsonPropertyName("type")] public string? Type { get; set; }
 
-    [JsonPropertyName("description")] public Description[]? Description { get; set; }
+    [JsonPropertyName("description")] public Description[]? Descriptions { get; set; }
 }

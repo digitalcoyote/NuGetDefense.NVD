@@ -12,7 +12,7 @@ internal static class Helpers
             _ => throw new ArgumentOutOfRangeException(nameof(severity), severity, null)
         };
     }
-    
+
     public static string Cvss3SeverityToString(CvssV3Severity? severity)
     {
         return severity switch
@@ -24,7 +24,7 @@ internal static class Helpers
             _ => throw new ArgumentOutOfRangeException(nameof(severity), severity, null)
         };
     }
-    
+
     public static string VersionEndTypeToString(VersionEndType? severity)
     {
         return severity switch
@@ -34,7 +34,7 @@ internal static class Helpers
             _ => throw new ArgumentOutOfRangeException(nameof(severity), severity, null)
         };
     }
-    
+
     public static string VersionStartTypeToString(VersionStartType? severity)
     {
         return severity switch
