@@ -1,9 +1,18 @@
+using System.Net;
 using System.Text.Json.Serialization;
 
 namespace NugetDefense.NVD.API;
 
 public class CveResponse
 {
+    public HttpStatusCode StatusCode;
+    public string? ReasonPhrase;
+    
+    /// <summary>Gets a value that indicates if the HTTP response was successful.</summary>
+    /// <returns>
+    /// <see langword="true" /> if <see cref="P:System.Net.Http.HttpResponseMessage.StatusCode" /> was in the range 200-299; otherwise, <see langword="false" />.</returns>
+    public bool IsSuccessStatusCode => StatusCode >= HttpStatusCode.OK && StatusCode <= (HttpStatusCode) 299;
+
     /// <summary>
     ///     If the value of <see cref="TotalResults" /> is greater than the value of resultsPerPage, then additional requests
     ///     are necessary to return the remaining CVE

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Threading;
 using Microsoft.Extensions.Configuration;
 using NuGetDefense;
 using NuGetDefense.Core;
@@ -12,7 +14,6 @@ namespace NVDFeedTests;
 
 public class BootStrapTests : IDisposable
 {
-    private const string BoostrapTestFeedFile = "./TestFiles/nvdcve-bootstrap.json";
     private readonly Client _client;
     private readonly Dictionary<string, Dictionary<string, VulnerabilityEntry>> _vulnDict = new();
 
@@ -26,20 +27,44 @@ public class BootStrapTests : IDisposable
         var totalResults = 0;
         _client = new(configuration["ApiKey"]);
 
+        const int retriesMax = 10;
+        var retries = 0;
+
         do
         {
             var options = new CvesRequestOptions
             {
                 StartIndex = startIndex,
-                VirtualMatchString = "cpe:2.3:*:*:bootstrap:*:*:*:*"
+                // VirtualMatchString = "cpe:2.3:*:*:bootstrap:*:*:*:*",
             };
+            CveResponse response = null;
 
-            var response = _client.GetCvesAsync(options).Result;
+            try
+            {
+                response = _client.GetCvesAsync(options).Result;
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+            if (response?.StatusCode == HttpStatusCode.TooManyRequests)
+            {
+                Thread.Sleep(TimeSpan.FromSeconds(3));
+            }
+            else if(response != null && response.IsSuccessStatusCode)
+            {
+                FeedUpdater.AddFeedToVulnerabilityData(response, _vulnDict);
+                totalResults = response.TotalResults;
+                startIndex += response.ResultsPerPage;
+                retries = 0;
+            }
+            else
+            {
+                retries++;
+            }
             
-            FeedUpdater.AddFeedToVulnerabilityData(response, _vulnDict);
-            
-            totalResults = response.TotalResults;
-        } while (startIndex < totalResults);
+        } while (startIndex < totalResults && retries <= retriesMax);
     }
 
     public void Dispose()

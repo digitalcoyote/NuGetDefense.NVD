@@ -46,7 +46,7 @@ public class Cve
     ///     or Rejected may not include the configuration object.
     /// </remarks>
     [JsonPropertyName("configurations")]
-    public Configuration[] Configurations { get; set; }
+    public Configuration[]? Configurations { get; set; }
 
     /// <summary>
     ///     ontains supplemental information relevant to the vulnerability,

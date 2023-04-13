@@ -158,7 +158,7 @@ public class FeedUpdater
         {
             var versionsDict = new Dictionary<string, List<string>>();
             var validNuGetPackage = true;
-            foreach (var match in feedVuln.Cve.Configurations.Where(c => c.Nodes is { Length: > 0 }).SelectMany(c => c.Nodes).SelectMany(n => n.CpeMatch).Where(m => m.Vulnerable))
+            foreach (var match in (feedVuln.Cve.Configurations ?? Array.Empty<Configuration>()).Where(c => c.Nodes is { Length: > 0 }).SelectMany(c => c.Nodes).SelectMany(n => n.CpeMatch).Where(m => m.Vulnerable))
             {
                 var cpe = Cpe.Parse(match.Criteria);
                 if (cpe.Part != "a") continue;
@@ -255,14 +255,14 @@ public class FeedUpdater
                 if (!nvdDict[cpe.Product].ContainsKey(feedVuln.Cve.Id))
                 {
                     var specifiedVector = Enum.TryParse<Vulnerability.AccessVectorType>(
-                        (string?)feedVuln.Cve.Metrics?.CvssMetricV3?[0].CvssData?.AttachVector, out var vector);
+                        feedVuln.Cve.Metrics?.CvssMetricV3?[0].CvssData?.AttachVector, out var vector);
                     nvdDict[cpe.Product].Add(feedVuln.Cve.Id, new()
                         {
                             Versions = versionsDict[cpe.Product].ToArray(),
                             Description = description,
                             Cwe = cwe,
                             Vendor = cpe.Vendor,
-                            Score = feedVuln.Cve.Metrics?.CvssMetricV3?[0]?.CvssData?.BaseScore,
+                            Score = feedVuln.Cve.Metrics?.CvssMetricV3?[0].CvssData?.BaseScore,
                             Vector = specifiedVector ? vector : Vulnerability.AccessVectorType.UNSPECIFIED,
                             References = (feedVuln.Cve.References ?? Array.Empty<Reference>()).Select(r => r.Url?.ToString())
                                 .ToArray()

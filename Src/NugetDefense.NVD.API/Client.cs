@@ -1,26 +1,48 @@
-﻿using System.Text.Json;
+﻿using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
+using System.Threading.RateLimiting;
 using System.Web;
 
 namespace NugetDefense.NVD.API;
 
 public class Client : IDisposable
 {
-    private const string baseUri = "https://services.nvd.nist.gov/rest/json/";
+    private const string BaseUri = "https://services.nvd.nist.gov/rest/json/";
     private const string Version = "0.0.1";
     private readonly string? _apiKey;
-    private readonly HttpClient client;
+    private readonly HttpClient _client;
+    private readonly SlidingWindowRateLimiter _rateLimiter;
 
     public Client(string? apiKey = null, string userAgent = $@"NuGetDefense.NVD.API.Client/{Version} (https://github.com/digitalcoyote/NuGetDefense.NVD/blob/master/README.md)")
     {
-        client = new();
-        if (!string.IsNullOrWhiteSpace(userAgent)) client.DefaultRequestHeaders.UserAgent.ParseAdd(userAgent);
+        SlidingWindowRateLimiterOptions rateLimiterOptions =  new ()
+        {
+            AutoReplenishment = true,
+            PermitLimit = 5,
+            QueueLimit = 5000,
+            SegmentsPerWindow = 10,
+            Window = TimeSpan.FromSeconds(30),
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+        };
+        
+        if (!string.IsNullOrWhiteSpace(apiKey))
+        {
+            rateLimiterOptions.PermitLimit = 50;
+        }
 
-        if (!string.IsNullOrWhiteSpace(apiKey)) client.DefaultRequestHeaders.Add("apikey", apiKey);
+
+        _rateLimiter = new (rateLimiterOptions);
+        _client = new(new ClientSideRateLimitedHandler(_rateLimiter));
+
+        if (!string.IsNullOrWhiteSpace(userAgent)) _client.DefaultRequestHeaders.UserAgent.ParseAdd(userAgent);
+        if (!string.IsNullOrWhiteSpace(apiKey)) _client.DefaultRequestHeaders.Add("apikey", apiKey);
+
     }
 
     public void Dispose()
     {
-        client.Dispose();
+        _client.Dispose();
     }
 
     /// <summary>
@@ -47,7 +69,7 @@ public class Client : IDisposable
     /// </remarks>
     public async Task<CveResponse?> GetCvesAsync(CvesRequestOptions options)
     {
-        const string cveBaseUri = $"{baseUri}cves/2.0?";
+        const string cveBaseUri = $"{BaseUri}cves/2.0?";
         List<string> queryStringParams = new();
         if (options.CpeName != null) queryStringParams.Add($"cpeName={HttpUtility.UrlEncode(options.CpeName)}");
 
@@ -105,10 +127,15 @@ public class Client : IDisposable
 
         if (options.StartIndex != null) queryStringParams.Add($"startIndex={HttpUtility.UrlEncode(options.StartIndex.ToString())}");
 
-        var response = await client.GetAsync(new Uri($"{cveBaseUri}{string.Join('&', queryStringParams)}"));
+        var response = await _client.GetAsync(new Uri($"{cveBaseUri}{string.Join('&', queryStringParams)}"));
+        var cveResponse = await response.Content.ReadFromJsonAsync<CveResponse>();
 
-        if (!response.IsSuccessStatusCode) throw new($"Failed to get CVE from NVD with error: {response.ReasonPhrase}");
-        var r = await response.Content.ReadAsStreamAsync();
-        return await JsonSerializer.DeserializeAsync<CveResponse>(r);
+        if (cveResponse != null)
+        {
+            cveResponse.StatusCode = response.StatusCode;
+            cveResponse.ReasonPhrase = response.ReasonPhrase;
+        }
+        
+        return cveResponse;
     }
 }
