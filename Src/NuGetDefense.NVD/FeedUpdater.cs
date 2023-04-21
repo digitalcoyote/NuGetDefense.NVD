@@ -8,6 +8,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using NuGet.Versioning;
 using NuGetDefense.Core;
@@ -16,10 +17,8 @@ using NVDFeedImporter;
 
 namespace NuGetDefense.NVD;
 
-[Obsolete("Use NuGetDefense.API.Client instead to utilize the 2.0 API. As of March 2023, the legacy feeds may no longer be available")]
 public class FeedUpdater
 {
-    [Obsolete]
     public static void AddFeedToVulnerabilityData(NVDFeed feed,
         Dictionary<string, Dictionary<string, VulnerabilityEntry>> nvdDict)
     {
@@ -149,6 +148,50 @@ public class FeedUpdater
         }
 
         nvdDict.MakeCorrections();
+    }
+
+    public static async Task<Dictionary<string, Dictionary<string, VulnerabilityEntry>>> UpdateVulnerabilityDataFromApi(Client nvdApiClient, CvesRequestOptions options, Dictionary<string, Dictionary<string, VulnerabilityEntry>> vulnDict)
+    {
+        var startIndex = options.StartIndex;
+        var totalResults = 0;
+        const int retriesMax = 10;
+        var retries = 0;
+        
+        do
+        {
+            CveResponse? response = null;
+
+            options.StartIndex = startIndex;
+
+            try
+            {
+                response = await nvdApiClient.GetCvesAsync(options);
+            }
+            catch(Exception e)
+            {
+                // Consider a better way to log this out (pass in a logger?)
+                Console.WriteLine($"Exception encountered while retrieving CVEs from the NVD API: {e}");
+            }
+
+            if (response?.StatusCode == HttpStatusCode.TooManyRequests)
+            {
+                Thread.Sleep(TimeSpan.FromSeconds(3));
+            }
+            else if(response is { IsSuccessStatusCode: true })
+            {
+                AddFeedToVulnerabilityData(response, vulnDict);
+                totalResults = response.TotalResults;
+                startIndex += response.ResultsPerPage;
+                retries = 0;
+            }
+            else
+            {
+                retries++;
+            }
+            
+        } while (startIndex < totalResults && retries <= retriesMax);
+        vulnDict.MakeCorrections();
+        return vulnDict;
     }
 
     public static void AddFeedToVulnerabilityData(CveResponse feed,

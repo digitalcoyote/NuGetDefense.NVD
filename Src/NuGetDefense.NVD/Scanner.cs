@@ -1,29 +1,35 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using MessagePack;
 using NuGet.Versioning;
 using NuGetDefense.Core;
+using NugetDefense.NVD.API;
 
 namespace NuGetDefense.NVD;
 
 public class Scanner
 {
     private readonly Dictionary<string, Dictionary<string, VulnerabilityEntry>> _nvdDict;
+    private Client _nvdApiClient = null;
 
-    public Scanner(string nugetFile, TimeSpan vulnDataReaTimeout, bool breakIfCannotRun = false, bool selfUpdate = false)
+    public Scanner(string nugetFile, TimeSpan vulnDataReaTimeout, Client nvdApiClient, bool breakIfCannotRun = false, bool selfUpdate = false)
     {
+        _nvdApiClient = nvdApiClient;
         NugetFile = nugetFile;
         BreakIfCannotRun = breakIfCannotRun;
         var lz4Options = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray)
             .WithSecurity(MessagePackSecurity.UntrustedData);
-        var vulnDataFile = Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory)!,
-            "VulnerabilityData.bin");
+        var vulnDataFile = Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory)!, "VulnerabilityData.bin");
+
         if (!File.Exists(vulnDataFile))
         {
-            _nvdDict = CreateNewVulnDataBin(vulnDataFile).Result;
+            _nvdDict = CreateNewVulnDataBin(vulnDataFile, nvdApiClient).Result;
         }
         else
         {
@@ -49,10 +55,14 @@ public class Scanner
             } while (ableToReadVulnerabilityData);
 
             if (!selfUpdate) return;
-            var recentFeed = FeedUpdater.GetRecentFeedAsync().Result;
-            var modifiedFeed = FeedUpdater.GetModifiedFeedAsync().Result;
-            FeedUpdater.AddFeedToVulnerabilityData(recentFeed, _nvdDict);
-            FeedUpdater.AddFeedToVulnerabilityData(modifiedFeed, _nvdDict);
+            var startDate = File.GetLastAccessTimeUtc(vulnDataFile).Add(TimeSpan.FromDays(-1));
+            var nvdApiOptions = new CvesRequestOptions
+            {
+                StartIndex = 0,
+                LastModStartDate = startDate
+            };
+            Debug.Assert(_nvdDict != null, nameof(_nvdDict) + " != null");
+            _nvdDict = FeedUpdater.UpdateVulnerabilityDataFromApi(nvdApiClient, nvdApiOptions, _nvdDict).Result;
             VulnerabilityData.SaveToBinFile(_nvdDict, "VulnerabilityData.bin", vulnDataReaTimeout);
         }
     }
@@ -60,17 +70,87 @@ public class Scanner
     private string NugetFile { get; }
     private bool BreakIfCannotRun { get; }
 
-    public static async Task<Dictionary<string, Dictionary<string, VulnerabilityEntry>>> CreateNewVulnDataBin(string vulnDataFile)
+    public static async Task<Dictionary<string, Dictionary<string, VulnerabilityEntry>>> CreateNewVulnDataBin(string vulnDataFile, Client nvdApiClient)
     {
-        var vulnDict = new Dictionary<string, Dictionary<string, VulnerabilityEntry>>();
-        await foreach (var feed in FeedUpdater.GetFeedsAsync())
-            FeedUpdater.AddFeedToVulnerabilityData(feed, vulnDict);
+        var options = new CvesRequestOptions
+        {
+            StartIndex = 0
+        };
+        var vulnDict = await FeedUpdater.UpdateVulnerabilityDataFromApi(nvdApiClient, options, new());
         VulnerabilityData.SaveToBinFile(vulnDict, vulnDataFile, TimeSpan.FromMinutes(10));
         return vulnDict;
     }
 
+    public Dictionary<string, Dictionary<string, Vulnerability>> GetVulnerabilitiesForPackagesUsingApi(NuGetPackage[] pkgs,
+        Dictionary<string, Dictionary<string, Vulnerability>>? vulnDict = null)
+    {
+        try
+        {
+            vulnDict ??= new();
+            foreach (var pkg in pkgs)
+            {
+                var options = new CvesRequestOptions
+                {
+                    StartIndex = 0,
+                    VirtualMatchString = $"cpe:2.3:*:*:{pkg.Id}:*:*:*:*",
+                };
+                GetVulnerabilitiesForPackage(_nvdApiClient, options, vulnDict);
+                _nvdApiClient.GetCvesAsync(options);
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(
+                $"{NugetFile} : {(BreakIfCannotRun ? "Error" : "Warning")} : NuGetDefense : NVD API scan failed with exception: {e}");
+        }
+
+        return vulnDict;
+    }
+
+    private async void GetVulnerabilitiesForPackage(Client nvdApiClient, CvesRequestOptions options, Dictionary<string, Dictionary<string, Vulnerability>> vulnDict)
+    {
+        var startIndex = options.StartIndex;
+        var totalResults = 0;
+        const int retriesMax = 10;
+        var retries = 0;
+        
+        do
+        {
+            CveResponse? response = null;
+
+            options.StartIndex = startIndex;
+
+            try
+            {
+                response = await nvdApiClient.GetCvesAsync(options);
+            }
+            catch(Exception e)
+            {
+                // Consider a better way to log this out (pass in a logger?)
+                Console.WriteLine($"Exception encountered while retrieving CVEs from the NVD API: {e}");
+            }
+
+            if (response?.StatusCode == HttpStatusCode.TooManyRequests)
+            {
+                Thread.Sleep(TimeSpan.FromSeconds(3));
+            }
+            else if(response is { IsSuccessStatusCode: true })
+            {
+                // AddFeedToVulnerabilityData(response, vulnDict);
+                totalResults = response.TotalResults;
+                startIndex += response.ResultsPerPage;
+                retries = 0;
+            }
+            else
+            {
+                retries++;
+            }
+            
+        } while (startIndex < totalResults && retries <= retriesMax);
+    }
+
     public Dictionary<string, Dictionary<string, Vulnerability>> GetVulnerabilitiesForPackages(NuGetPackage[] pkgs,
-        Dictionary<string, Dictionary<string, Vulnerability>> vulnDict = null)
+        Dictionary<string, Dictionary<string, Vulnerability>>? vulnDict = null)
     {
         try
         {

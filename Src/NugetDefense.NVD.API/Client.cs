@@ -127,15 +127,27 @@ public class Client : IDisposable
 
         if (options.StartIndex != null) queryStringParams.Add($"startIndex={HttpUtility.UrlEncode(options.StartIndex.ToString())}");
 
-        var response = await _client.GetAsync(new Uri($"{cveBaseUri}{string.Join('&', queryStringParams)}"));
-        var cveResponse = await response.Content.ReadFromJsonAsync<CveResponse>();
-
-        if (cveResponse != null)
+        CveResponse? cveResponse = null;
+        HttpResponseMessage response = null;
+        try
         {
-            cveResponse.StatusCode = response.StatusCode;
-            cveResponse.ReasonPhrase = response.ReasonPhrase;
+            response = await _client.GetAsync(new Uri($"{cveBaseUri}{string.Join('&', queryStringParams)}"));
+            cveResponse = await response.Content.ReadFromJsonAsync<CveResponse>();
+
+            if (cveResponse != null)
+            {
+                cveResponse.StatusCode = response.StatusCode;
+                cveResponse.ReasonPhrase = response.ReasonPhrase;
+            }
         }
-        
+        catch(Exception e)
+        {
+            var a = $"{cveBaseUri}{string.Join('&', queryStringParams)}";
+            Console.Write(response.RequestMessage);
+            Console.Write(a);
+            Console.Write(e);
+        }
+
         return cveResponse;
     }
 }

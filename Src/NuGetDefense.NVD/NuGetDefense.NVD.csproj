@@ -3,9 +3,10 @@
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <LangVersion>10</LangVersion>
-        <PackageVersion>2.0.9.1</PackageVersion>
+        <PackageVersion>2.1.0</PackageVersion>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Nullable>enable</Nullable>
+        <Copyright>Curtis Carter 2023</Copyright>
     </PropertyGroup>
     <PropertyGroup>
         <Authors>Curtis Carter</Authors>
@@ -13,7 +14,7 @@
         <Title>NuGetDefense.NVD</Title>
         <PackageProjectUrl>https://github.com/DigitalCoyote/NuGetDefense.NVD</PackageProjectUrl>
         <Description>Provides logic to scan packages using the National Vulnerability Database.</Description>
-        <PackageReleaseNotes>https://github.com/digitalcoyote/NuGetDefense.NVD/releases/tag/v2.0.9.1</PackageReleaseNotes>
+        <PackageReleaseNotes>https://github.com/digitalcoyote/NuGetDefense.NVD/releases/tag/v2.1.0</PackageReleaseNotes>
         <RepositoryUrl>https://github.com/digitalcoyote/NuGetDefense.NVD.git</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageTags>Security</PackageTags>
@@ -26,13 +27,13 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
     <ItemGroup>
-        <None Include="icon.png" Pack="true" PackagePath="\"/>
+        <None Include="icon.png" Pack="true" PackagePath="\" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="MessagePack" Version="2.5.108"/>
-        <PackageReference Include="NuGet.Versioning" Version="6.5.0"/>
-        <PackageReference Include="NuGetDefense.Core" Version="2.0.5"/>
-        <PackageReference Include="System.Text.Json" Version="7.0.2"/>
+        <PackageReference Include="MessagePack" Version="2.5.108" />
+        <PackageReference Include="NuGet.Versioning" Version="6.5.0" />
+        <PackageReference Include="NuGetDefense.Core" Version="2.0.5" />
+        <PackageReference Include="System.Text.Json" Version="7.0.2" />
     </ItemGroup>
     <ItemGroup>
         <Content Include="..\..\README.md" Pack="true" PackagePath="\">
@@ -40,6 +41,6 @@
         </Content>
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\NugetDefense.NVD.API\NugetDefense.NVD.API.csproj"/>
+        <ProjectReference Include="..\NugetDefense.NVD.API\NugetDefense.NVD.API.csproj" />
     </ItemGroup>
 </Project>

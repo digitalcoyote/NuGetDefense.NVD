@@ -7,7 +7,7 @@
         <AssemblyName>NugetDefense.NVD.API</AssemblyName>
         <RootNamespace>NugetDefense.NVD.API</RootNamespace>
         <LangVersion>default</LangVersion>
-        <Version>0.0.1-alpha</Version>
+        <Version>1.0.0</Version>
         <Title>NugetDefense.NVD.API</Title>
         <Description>A NVD 2.0 API client written for NuGetDefense. This product uses the NVD API but is not endorsed or certified by the NVD.</Description>
         <Copyright>Curtis Carter 2023</Copyright>
@@ -15,8 +15,9 @@
         <PackageIcon>icon.png</PackageIcon>
         <RepositoryUrl>https://github.com/digitalcoyote/NuGetDefense.NVD</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageTags>security nvd vulnerability client</PackageTags>
-        <PackageReleaseNotes>Initial Prerelase</PackageReleaseNotes>
+        <PackageTags>security nvd vulnerability client nugetdefense</PackageTags>
+        <PackageReleaseNotes>Initial Release</PackageReleaseNotes>
+        <Authors>Curtis Carter</Authors>
     </PropertyGroup>
 
     <ItemGroup>

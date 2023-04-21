@@ -13,7 +13,7 @@ internal sealed class ClientSideRateLimitedHandler
     private readonly RateLimiter _rateLimiter;
 
     public ClientSideRateLimitedHandler(RateLimiter limiter)
-        : base(new HttpClientHandler()) => _rateLimiter = limiter;
+        : base(new HttpClientHandler{AutomaticDecompression = DecompressionMethods.Deflate | DecompressionMethods.GZip}) => _rateLimiter = limiter;
 
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
