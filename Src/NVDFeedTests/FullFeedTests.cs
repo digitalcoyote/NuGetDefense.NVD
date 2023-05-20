@@ -31,7 +31,7 @@ public class FullFeedTests : IDisposable
             StartIndex = 0,
             // VirtualMatchString = "cpe:2.3:*:*:bootstrap:*:*:*:*",
         };
-        _vulnDict = FeedUpdater.UpdateVulnerabilityDataFromApi(_client, options, new()).Result;        
+        _vulnDict = VulnerabilityDataUpdater.UpdateVulnerabilityDataFromApi(_client, options, new()).Result;        
     }
 
     public void Dispose()

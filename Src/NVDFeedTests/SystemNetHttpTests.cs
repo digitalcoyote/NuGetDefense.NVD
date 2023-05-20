@@ -23,7 +23,7 @@ public class SystemNetHttpTests : IAsyncLifetime
             _systemNetHttpTestFeed = JsonSerializer.DeserializeAsync<NVDFeed>(fs).Result;
             _vulnDict =
                 new();
-            FeedUpdater.AddFeedToVulnerabilityData(_systemNetHttpTestFeed, _vulnDict);
+            VulnerabilityDataUpdater.AddFeedToVulnerabilityData(_systemNetHttpTestFeed, _vulnDict);
         });
     }
 

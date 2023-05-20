@@ -16,11 +16,12 @@ namespace NuGetDefense.NVD;
 public class Scanner
 {
     private readonly Dictionary<string, Dictionary<string, VulnerabilityEntry>> _nvdDict;
-    private Client _nvdApiClient = null;
+    private readonly Client? _nvdApiClient;
 
-    public Scanner(string nugetFile, TimeSpan vulnDataReaTimeout, Client nvdApiClient, bool breakIfCannotRun = false, bool selfUpdate = false)
+    public Scanner(string nugetFile, TimeSpan vulnDataReaTimeout, Client nvdApiClient, Dictionary<string, Dictionary<string, VulnerabilityEntry>> nvdDict, bool breakIfCannotRun = false, bool selfUpdate = false)
     {
         _nvdApiClient = nvdApiClient;
+        _nvdDict = nvdDict;
         NugetFile = nugetFile;
         BreakIfCannotRun = breakIfCannotRun;
         var lz4Options = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray)
@@ -29,7 +30,7 @@ public class Scanner
 
         if (!File.Exists(vulnDataFile))
         {
-            _nvdDict = CreateNewVulnDataBin(vulnDataFile, nvdApiClient).Result;
+            _nvdDict = FeedUpdater.CreateNewVulnDataBin(vulnDataFile, nvdApiClient).Result;
         }
         else
         {
@@ -70,18 +71,7 @@ public class Scanner
     private string NugetFile { get; }
     private bool BreakIfCannotRun { get; }
 
-    public static async Task<Dictionary<string, Dictionary<string, VulnerabilityEntry>>> CreateNewVulnDataBin(string vulnDataFile, Client nvdApiClient)
-    {
-        var options = new CvesRequestOptions
-        {
-            StartIndex = 0
-        };
-        var vulnDict = await FeedUpdater.UpdateVulnerabilityDataFromApi(nvdApiClient, options, new());
-        VulnerabilityData.SaveToBinFile(vulnDict, vulnDataFile, TimeSpan.FromMinutes(10));
-        return vulnDict;
-    }
-
-    public Dictionary<string, Dictionary<string, Vulnerability>> GetVulnerabilitiesForPackagesUsingApi(NuGetPackage[] pkgs,
+    public async Task<Dictionary<string, Dictionary<string, Vulnerability>>> GetVulnerabilitiesForPackagesUsingApiAsync(NuGetPackage[] pkgs,
         Dictionary<string, Dictionary<string, Vulnerability>>? vulnDict = null)
     {
         try
@@ -94,8 +84,7 @@ public class Scanner
                     StartIndex = 0,
                     VirtualMatchString = $"cpe:2.3:*:*:{pkg.Id}:*:*:*:*",
                 };
-                GetVulnerabilitiesForPackage(_nvdApiClient, options, vulnDict);
-                _nvdApiClient.GetCvesAsync(options);
+                await GetVulnerabilitiesForPackage(_nvdApiClient, options, vulnDict);
             }
         }
         catch (Exception e)
@@ -107,7 +96,7 @@ public class Scanner
         return vulnDict;
     }
 
-    private async void GetVulnerabilitiesForPackage(Client nvdApiClient, CvesRequestOptions options, Dictionary<string, Dictionary<string, Vulnerability>> vulnDict)
+    private static async Task GetVulnerabilitiesForPackage(Client nvdApiClient, CvesRequestOptions options, Dictionary<string, Dictionary<string, Vulnerability>> vulnDict)
     {
         var startIndex = options.StartIndex;
         var totalResults = 0;
