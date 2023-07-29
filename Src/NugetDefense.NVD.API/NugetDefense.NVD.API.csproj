@@ -7,7 +7,7 @@
         <AssemblyName>NugetDefense.NVD.API</AssemblyName>
         <RootNamespace>NugetDefense.NVD.API</RootNamespace>
         <LangVersion>default</LangVersion>
-        <Version>1.0.0-prerelease</Version>
+        <Version>1.0.0-prerelease2</Version>
         <Title>NugetDefense.NVD.API</Title>
         <Description>A NVD 2.0 API client written for NuGetDefense. This product uses the NVD API but is not endorsed or certified by the NVD.</Description>
         <Copyright>Curtis Carter 2023</Copyright>
@@ -25,6 +25,7 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <AssemblyVersion>1.0.0-prerelease2</AssemblyVersion>
     </PropertyGroup>
 
     <ItemGroup>
