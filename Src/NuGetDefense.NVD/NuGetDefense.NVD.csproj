@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
-        <LangVersion>10</LangVersion>
-        <PackageVersion>2.1.0-prelease3</PackageVersion>
+        <LangVersion>12</LangVersion>
+        <PackageVersion>2.1.0</PackageVersion>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Nullable>enable</Nullable>
         <Copyright>Curtis Carter 2023</Copyright>
+        <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
     </PropertyGroup>
     <PropertyGroup>
         <Authors>Curtis Carter</Authors>
@@ -30,10 +30,10 @@
         <None Include="icon.png" Pack="true" PackagePath="\" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="MessagePack" Version="2.5.124" />
-        <PackageReference Include="NuGet.Versioning" Version="6.6.1" />
-        <PackageReference Include="NuGetDefense.Core" Version="2.0.6" />
-        <PackageReference Include="System.Text.Json" Version="7.0.3" />
+        <PackageReference Include="MessagePack" Version="2.5.140" />
+        <PackageReference Include="NuGet.Versioning" Version="6.8.0" />
+        <PackageReference Include="NuGetDefense.Core" Version="2.0.7" />
+        <PackageReference Include="System.Text.Json" Version="8.0.0" />
     </ItemGroup>
     <ItemGroup>
         <Content Include="..\..\README.md" Pack="true" PackagePath="\">
