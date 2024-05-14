@@ -15,7 +15,7 @@ namespace NVDFeedTests;
 public class FullFeedTests : IDisposable
 {
     private readonly Client _client;
-    private readonly Dictionary<string, Dictionary<string, VulnerabilityEntry>> _vulnDict = new();
+    private readonly Dictionary<string, Dictionary<string, VulnerabilityEntry>> _vulnDict;
 
     public FullFeedTests()
     {

@@ -30,7 +30,7 @@ public class Scanner
 
         if (!File.Exists(vulnDataFile))
         {
-            _nvdDict = FeedUpdater.CreateNewVulnDataBin(vulnDataFile, nvdApiClient).Result;
+            _nvdDict = VulnerabilityDataUpdater.CreateNewVulnDataBin(vulnDataFile, nvdApiClient).Result;
         }
         else
         {
@@ -63,7 +63,7 @@ public class Scanner
                 LastModStartDate = startDate
             };
             Debug.Assert(_nvdDict != null, nameof(_nvdDict) + " != null");
-            _nvdDict = FeedUpdater.UpdateVulnerabilityDataFromApi(nvdApiClient, nvdApiOptions, _nvdDict).Result;
+            _nvdDict = VulnerabilityDataUpdater.UpdateVulnerabilityDataFromApi(nvdApiClient, nvdApiOptions, _nvdDict).Result;
             VulnerabilityData.SaveToBinFile(_nvdDict, "VulnerabilityData.bin", vulnDataReaTimeout);
         }
     }

@@ -14,9 +14,11 @@ public class Client : IDisposable
     private readonly HttpClient _client;
     private readonly SlidingWindowRateLimiter _rateLimiter;
 
-    public Client(string? apiKey = null, string userAgent = $@"NuGetDefense.NVD.API.Client/{Version} (https://github.com/digitalcoyote/NuGetDefense.NVD/blob/master/README.md)")
+    public Client(string? apiKey = null,
+        string userAgent =
+            $@"NuGetDefense.NVD.API.Client/{Version} (https://github.com/digitalcoyote/NuGetDefense.NVD/blob/master/README.md)")
     {
-        SlidingWindowRateLimiterOptions rateLimiterOptions =  new ()
+        SlidingWindowRateLimiterOptions rateLimiterOptions = new()
         {
             AutoReplenishment = true,
             PermitLimit = 5,
@@ -25,19 +27,18 @@ public class Client : IDisposable
             Window = TimeSpan.FromSeconds(30),
             QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
         };
-        
+
         if (!string.IsNullOrWhiteSpace(apiKey))
         {
             rateLimiterOptions.PermitLimit = 50;
         }
 
 
-        _rateLimiter = new (rateLimiterOptions);
+        _rateLimiter = new(rateLimiterOptions);
         _client = new(new ClientSideRateLimitedHandler(_rateLimiter));
 
         if (!string.IsNullOrWhiteSpace(userAgent)) _client.DefaultRequestHeaders.UserAgent.ParseAdd(userAgent);
         if (!string.IsNullOrWhiteSpace(apiKey)) _client.DefaultRequestHeaders.Add("apikey", apiKey);
-
     }
 
     public void Dispose()
@@ -70,32 +71,46 @@ public class Client : IDisposable
     public async Task<CveResponse?> GetCvesAsync(CvesRequestOptions options)
     {
         const string cveBaseUri = $"{BaseUri}cves/2.0?";
-        List<string> queryStringParams = new();
+        List<string> queryStringParams = [];
         if (options.CpeName != null) queryStringParams.Add($"cpeName={HttpUtility.UrlEncode(options.CpeName)}");
 
         if (options.CveId != null) queryStringParams.Add($"cveId={HttpUtility.UrlEncode(options.CveId)}");
 
         if (options.CweId != null) queryStringParams.Add($"cweId={HttpUtility.UrlEncode(options.CweId)}");
 
-        if (options.CvssV2Metrics != null) queryStringParams.Add($"cvssV2Metrics={HttpUtility.UrlEncode(options.CvssV2Metrics)}");
+        if (options.CvssV2Metrics != null)
+            queryStringParams.Add($"cvssV2Metrics={HttpUtility.UrlEncode(options.CvssV2Metrics)}");
 
-        if (options.CvssV2Severity != null) queryStringParams.Add($"cvssV2Severity={HttpUtility.UrlEncode(Helpers.Cvss2SeverityToString(options.CvssV2Severity))}");
+        if (options.CvssV2Severity != null)
+            queryStringParams.Add(
+                $"cvssV2Severity={HttpUtility.UrlEncode(Helpers.Cvss2SeverityToString(options.CvssV2Severity))}");
 
-        if (options.CvssV3Metrics != null) queryStringParams.Add($"cvssV3Metrics={HttpUtility.UrlEncode(options.CvssV3Metrics)}");
+        if (options.CvssV3Metrics != null)
+            queryStringParams.Add($"cvssV3Metrics={HttpUtility.UrlEncode(options.CvssV3Metrics)}");
 
-        if (options.CvssV3Severity != null) queryStringParams.Add($"cvssV3Severity={HttpUtility.UrlEncode(Helpers.Cvss3SeverityToString(options.CvssV3Severity))}");
+        if (options.CvssV3Severity != null)
+            queryStringParams.Add(
+                $"cvssV3Severity={HttpUtility.UrlEncode(Helpers.Cvss3SeverityToString(options.CvssV3Severity))}");
 
-        if (options.SourceIdentifier != null) queryStringParams.Add($"sourceIdentifier={HttpUtility.UrlEncode(options.SourceIdentifier)}");
+        if (options.SourceIdentifier != null)
+            queryStringParams.Add($"sourceIdentifier={HttpUtility.UrlEncode(options.SourceIdentifier)}");
 
-        if (options.VirtualMatchString != null) queryStringParams.Add($"virtualMatchString={HttpUtility.UrlEncode(options.VirtualMatchString)}");
+        if (options.VirtualMatchString != null)
+            queryStringParams.Add($"virtualMatchString={HttpUtility.UrlEncode(options.VirtualMatchString)}");
 
-        if (options.VersionEnd != null) queryStringParams.Add($"versionEnd={HttpUtility.UrlEncode(options.VersionEnd)}");
+        if (options.VersionEnd != null)
+            queryStringParams.Add($"versionEnd={HttpUtility.UrlEncode(options.VersionEnd)}");
 
-        if (options.VersionEndType != null) queryStringParams.Add($"versionEndType={HttpUtility.UrlEncode(Helpers.VersionEndTypeToString(options.VersionEndType))}");
+        if (options.VersionEndType != null)
+            queryStringParams.Add(
+                $"versionEndType={HttpUtility.UrlEncode(Helpers.VersionEndTypeToString(options.VersionEndType))}");
 
-        if (options.VersionStart != null) queryStringParams.Add($"versionStart={HttpUtility.UrlEncode(options.VersionStart)}");
+        if (options.VersionStart != null)
+            queryStringParams.Add($"versionStart={HttpUtility.UrlEncode(options.VersionStart)}");
 
-        if (options.VersionStartType != null) queryStringParams.Add($"versionStartType={HttpUtility.UrlEncode(Helpers.VersionStartTypeToString(options.VersionStartType))}");
+        if (options.VersionStartType != null)
+            queryStringParams.Add(
+                $"versionStartType={HttpUtility.UrlEncode(Helpers.VersionStartTypeToString(options.VersionStartType))}");
 
         if (options.HasCertAlerts) queryStringParams.Add("hasCertAlerts");
 
@@ -111,28 +126,40 @@ public class Client : IDisposable
 
         if (options.NoRejected) queryStringParams.Add("noRejected");
 
-        if (!string.IsNullOrEmpty(options.KeywordSearch)) queryStringParams.Add($"keywordSearch={HttpUtility.UrlEncode(options.KeywordSearch)}");
+        if (!string.IsNullOrEmpty(options.KeywordSearch))
+            queryStringParams.Add($"keywordSearch={HttpUtility.UrlEncode(options.KeywordSearch)}");
 
-        if (options.LastModStartDate != null) queryStringParams.Add($"lastModStartDate={HttpUtility.UrlEncode(((DateTime)options.LastModStartDate).ToString("O"))}");
+        if (options.LastModStartDate != null)
+            queryStringParams.Add(
+                $"lastModStartDate={HttpUtility.UrlEncode(((DateTime)options.LastModStartDate).ToString("O"))}");
 
-        if (options.LastModEndDate != null) queryStringParams.Add($"lastModEndDate={HttpUtility.UrlEncode(((DateTime)options.LastModEndDate).ToString("O"))}");
+        if (options.LastModEndDate != null)
+            queryStringParams.Add(
+                $"lastModEndDate={HttpUtility.UrlEncode(((DateTime)options.LastModEndDate).ToString("O"))}");
 
 
-        if (options.PubStartDate != null) queryStringParams.Add($"pubStartDate={HttpUtility.UrlEncode(((DateTime)options.PubStartDate).ToString("O"))}");
+        if (options.PubStartDate != null)
+            queryStringParams.Add(
+                $"pubStartDate={HttpUtility.UrlEncode(((DateTime)options.PubStartDate).ToString("O"))}");
 
 
-        if (options.PubEndDate != null) queryStringParams.Add($"pubEndDate={HttpUtility.UrlEncode(((DateTime)options.PubEndDate).ToString("O"))}");
+        if (options.PubEndDate != null)
+            queryStringParams.Add($"pubEndDate={HttpUtility.UrlEncode(((DateTime)options.PubEndDate).ToString("O"))}");
 
-        if (options.ResultsPerPage != null) queryStringParams.Add($"resultsPerPage={HttpUtility.UrlEncode(options.ResultsPerPage.ToString())}");
+        if (options.ResultsPerPage != null)
+            queryStringParams.Add($"resultsPerPage={HttpUtility.UrlEncode(options.ResultsPerPage.ToString())}");
 
-        if (options.StartIndex != null) queryStringParams.Add($"startIndex={HttpUtility.UrlEncode(options.StartIndex.ToString())}");
+        if (options.StartIndex != null)
+            queryStringParams.Add($"startIndex={HttpUtility.UrlEncode(options.StartIndex.ToString())}");
 
         CveResponse? cveResponse = null;
-        HttpResponseMessage response = null;
+        HttpResponseMessage? response = null;
+        string? responseContent = null;
         try
         {
             response = await _client.GetAsync(new Uri($"{cveBaseUri}{string.Join('&', queryStringParams)}"));
-            cveResponse = await response.Content.ReadFromJsonAsync<CveResponse>();
+            responseContent = await response.Content.ReadAsStringAsync();
+            cveResponse = JsonSerializer.Deserialize<CveResponse>(responseContent);
 
             if (cveResponse != null)
             {
@@ -140,12 +167,13 @@ public class Client : IDisposable
                 cveResponse.ReasonPhrase = response.ReasonPhrase;
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             var a = $"{cveBaseUri}{string.Join('&', queryStringParams)}";
-            Console.Write(response.RequestMessage);
+            Console.Write(response?.RequestMessage);
             Console.Write(a);
             Console.Write(e);
+            if (responseContent != null) Console.Write($"Response: {responseContent}");
         }
 
         return cveResponse;
