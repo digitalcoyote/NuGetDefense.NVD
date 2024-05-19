@@ -18,7 +18,7 @@ public class Scanner
     private readonly Dictionary<string, Dictionary<string, VulnerabilityEntry>> _nvdDict;
     private readonly Client? _nvdApiClient;
 
-    public Scanner(string nugetFile, TimeSpan vulnDataReaTimeout, Client nvdApiClient, Dictionary<string, Dictionary<string, VulnerabilityEntry>> nvdDict, bool breakIfCannotRun = false, bool selfUpdate = false)
+    public Scanner(string nugetFile,  string vulnDataFile, TimeSpan vulnDataReaTimeout, Client nvdApiClient, Dictionary<string, Dictionary<string, VulnerabilityEntry>> nvdDict, bool breakIfCannotRun = false, bool selfUpdate = false)
     {
         _nvdApiClient = nvdApiClient;
         _nvdDict = nvdDict;
@@ -26,7 +26,6 @@ public class Scanner
         BreakIfCannotRun = breakIfCannotRun;
         var lz4Options = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray)
             .WithSecurity(MessagePackSecurity.UntrustedData);
-        var vulnDataFile = Path.Combine(Path.GetDirectoryName(AppContext.BaseDirectory)!, "VulnerabilityData.bin");
 
         if (!File.Exists(vulnDataFile))
         {
