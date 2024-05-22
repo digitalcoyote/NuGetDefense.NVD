@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <LangVersion>12</LangVersion>
-        <PackageVersion>2.1.5-pre0002</PackageVersion>
+        <PackageVersion>2.1.5</PackageVersion>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Nullable>enable</Nullable>
         <Copyright>Curtis Carter 2024</Copyright>
@@ -16,7 +16,7 @@
         <Title>NuGetDefense.NVD</Title>
         <PackageProjectUrl>https://github.com/DigitalCoyote/NuGetDefense.NVD</PackageProjectUrl>
         <Description>Provides logic to scan packages using the National Vulnerability Database.</Description>
-        <PackageReleaseNotes>https://github.com/digitalcoyote/NuGetDefense.NVD/releases/tag/v2.1.5-pre0002-prelease2</PackageReleaseNotes>
+        <PackageReleaseNotes>https://github.com/digitalcoyote/NuGetDefense.NVD/releases/tag/v2.1.5</PackageReleaseNotes>
         <RepositoryUrl>https://github.com/digitalcoyote/NuGetDefense.NVD.git</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageTags>Security</PackageTags>
