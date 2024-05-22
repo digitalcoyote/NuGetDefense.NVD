@@ -9,7 +9,7 @@
         <Version>1.0.1</Version>
         <Title>NugetDefense.NVD.API</Title>
         <Description>A NVD 2.0 API client written for NuGetDefense. This product uses the NVD API but is not endorsed or certified by the NVD.</Description>
-        <Copyright>Curtis Carter 2023</Copyright>
+        <Copyright>Curtis Carter 2024</Copyright>
         <PackageProjectUrl>https://digitalcoyote.github.io/NuGetDefense/</PackageProjectUrl>
         <PackageIcon>icon.png</PackageIcon>
         <RepositoryUrl>https://github.com/digitalcoyote/NuGetDefense.NVD</RepositoryUrl>
