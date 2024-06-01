@@ -217,7 +217,7 @@ namespace NuGetDefense.NVD
         [JsonPropertyName("availabilityImpact")]
         public string AvailabilityImpact { get; set; }
 
-        [JsonPropertyName("baseScore")] public double? BaseScore { get; set; }
+        [JsonPropertyName("baseScore")] public decimal? BaseScore { get; set; }
 
         [JsonPropertyName("baseSeverity")] public string BaseSeverity { get; set; }
     }
