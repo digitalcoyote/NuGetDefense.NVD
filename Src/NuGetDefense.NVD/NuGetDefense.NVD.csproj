@@ -2,13 +2,13 @@
 
     <PropertyGroup>
         <LangVersion>12</LangVersion>
-        <PackageVersion>2.1.6.1</PackageVersion>
+        <PackageVersion>2.1.6.2</PackageVersion>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Nullable>enable</Nullable>
         <Copyright>Curtis Carter 2024</Copyright>
         <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
-        <AssemblyVersion>2.1.6.1</AssemblyVersion>
-        <FileVersion>2.1.6.1</FileVersion>
+        <AssemblyVersion>2.1.6.2</AssemblyVersion>
+        <FileVersion>2.1.6.2</FileVersion>
     </PropertyGroup>
     <PropertyGroup>
         <Authors>Curtis Carter</Authors>
@@ -16,7 +16,7 @@
         <Title>NuGetDefense.NVD</Title>
         <PackageProjectUrl>https://github.com/DigitalCoyote/NuGetDefense.NVD</PackageProjectUrl>
         <Description>Provides logic to scan packages using the National Vulnerability Database.</Description>
-        <PackageReleaseNotes>https://github.com/digitalcoyote/NuGetDefense.NVD/releases/tag/v2.1.6.1</PackageReleaseNotes>
+        <PackageReleaseNotes>https://github.com/digitalcoyote/NuGetDefense.NVD/releases/tag/v2.1.6.2</PackageReleaseNotes>
         <RepositoryUrl>https://github.com/digitalcoyote/NuGetDefense.NVD.git</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageTags>Security</PackageTags>
@@ -33,8 +33,8 @@
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="MessagePack" Version="2.5.187" />
-        <PackageReference Include="NuGet.Versioning" Version="6.10.1" />
-        <PackageReference Include="NuGetDefense.Core" Version="2.0.13.2" />
+        <PackageReference Include="NuGet.Versioning" Version="6.11.1" />
+        <PackageReference Include="NuGetDefense.Core" Version="2.0.13.3" />
         <PackageReference Include="System.Text.Json" Version="8.0.5" />
     </ItemGroup>
     <ItemGroup>

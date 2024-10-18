@@ -9,7 +9,7 @@ namespace NugetDefense.NVD.API;
 public class Client : IDisposable
 {
     private const string BaseUri = "https://services.nvd.nist.gov/rest/json/";
-    private const string Version = "1.0.2";
+    private const string Version = "1.0.2.1";
     private readonly string? _apiKey;
     private readonly HttpClient _client;
     private readonly SlidingWindowRateLimiter _rateLimiter;
