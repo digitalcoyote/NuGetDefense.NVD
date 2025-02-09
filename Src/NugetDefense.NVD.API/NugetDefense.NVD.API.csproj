@@ -6,10 +6,10 @@
         <AssemblyName>NugetDefense.NVD.API</AssemblyName>
         <RootNamespace>NugetDefense.NVD.API</RootNamespace>
         <LangVersion>default</LangVersion>
-        <Version>1.0.2.1</Version>
+        <Version>1.0.2.2</Version>
         <Title>NugetDefense.NVD.API</Title>
         <Description>A NVD 2.0 API client written for NuGetDefense. This product uses the NVD API but is not endorsed or certified by the NVD.</Description>
-        <Copyright>Curtis Carter 2024</Copyright>
+        <Copyright>Curtis Carter 2025</Copyright>
         <PackageProjectUrl>https://digitalcoyote.github.io/NuGetDefense/</PackageProjectUrl>
         <PackageIcon>icon.png</PackageIcon>
         <RepositoryUrl>https://github.com/digitalcoyote/NuGetDefense.NVD</RepositoryUrl>
@@ -24,9 +24,9 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <AssemblyVersion>1.0.2.1</AssemblyVersion>
-        <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
-        <FileVersion>1.0.2.1</FileVersion>
+        <AssemblyVersion>1.0.2.2</AssemblyVersion>
+        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+        <FileVersion>1.0.2.2</FileVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -42,8 +42,8 @@
         </Content>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="System.Net.Http.Json" Version="8.0.1" />
-        <PackageReference Include="System.Threading.RateLimiting" Version="8.0.0" />
+        <PackageReference Include="System.Net.Http.Json" Version="9.0.1" />
+        <PackageReference Include="System.Threading.RateLimiting" Version="9.0.1" />
     </ItemGroup>
 
 </Project>
